@@ -1,162 +1,149 @@
-# Cai dat Skills — Huong dan chi tiet
+# Cài đặt Skills — Hướng dẫn chi tiết
 
-Skills trong folder nay duoc thiet ke cho **Claude Code** — CLI tool cua Anthropic.
+Skills trong folder này được thiết kế cho **Claude Code** — CLI tool của Anthropic.
 
 ---
 
-## Yeu cau
+## Yêu cầu
 
-| Yeu cau | Chi tiet |
+| Yêu cầu | Chi tiết |
 |---------|----------|
-| Claude Code | CLI hoac IDE extension ([cai dat](https://claude.ai/code)) |
-| Subscription | Claude Pro/Max hoac API key co Sonnet 4+ |
-| OS | macOS, Linux, hoac Windows (WSL) |
+| Claude Code | CLI hoặc IDE extension ([cài đặt](https://claude.ai/code)) |
+| Subscription | Claude Pro/Max hoặc API key có Sonnet 4+ |
+| OS | macOS, Linux, hoặc Windows (WSL) |
 
 ---
 
-## Cai dat nhanh
+## Cài đặt nhanh
 
 ```bash
 # 1. Clone repo
 git clone https://github.com/your-org/ai_native_company.git
 cd ai_native_company/community_version
 
-# 2. Copy TAT CA skills vao Claude Code
+# 2. Copy TẤT CẢ skills vào Claude Code
 cp -r skills/vibe-aiworkforce ~/.claude/skills/
 cp -r skills/vibe-company-orchestrator ~/.claude/skills/
-cp -r skills/vibe-aiworkforce-gps ~/.claude/skills/
 
-# 3. Verify cai dat
+# 3. Xác minh cài đặt
 ls ~/.claude/skills/vibe-*/SKILL.md
-# Phai thay 3 file SKILL.md
+# Phải thấy 2 file SKILL.md
 ```
 
 ---
 
-## Cai dat tung skill
+## Cài đặt từng skill
 
-### Chi cai dat skill can thiet:
+### Chỉ cài đặt skill cần thiết:
 
 ```bash
-# Chi thiet ke cong ty
+# Chỉ thiết kế công ty
 cp -r skills/vibe-company-orchestrator ~/.claude/skills/
 
-# Chi xay AI workforce
+# Chỉ xây AI workforce
 cp -r skills/vibe-aiworkforce ~/.claude/skills/
-
-# Chi dieu phoi task
-cp -r skills/vibe-aiworkforce-gps ~/.claude/skills/
 ```
 
 ---
 
-## Verify
+## Xác minh
 
 ```bash
-# Kiem tra skill da duoc nhan dien
+# Kiểm tra skill đã được nhận diện
 ls -la ~/.claude/skills/
 
-# Output ky vong:
+# Output kỳ vọng:
 # vibe-aiworkforce/
 # vibe-company-orchestrator/
-# vibe-aiworkforce-gps/
 
-# Kiem tra moi skill co SKILL.md
+# Kiểm tra mỗi skill có SKILL.md
 for skill in ~/.claude/skills/vibe-*/; do
   if [ -f "$skill/SKILL.md" ]; then
     echo "OK: $(basename $skill)"
   else
-    echo "LOI: $(basename $skill) — thieu SKILL.md"
+    echo "LỖI: $(basename $skill) — thiếu SKILL.md"
   fi
 done
 ```
 
 ---
 
-## Su dung
+## Sử dụng
 
-Sau khi cai dat, mo Claude Code va go:
+Sau khi cài đặt, mở Claude Code và gõ:
 
 ```
-# Thiet ke toan bo cong ty
+# Thiết kế toàn bộ công ty
 /vibe-company-orchestrator
-→ Mo ta doanh nghiep cua ban → Skill tao folder structure + SOP
+→ Mô tả doanh nghiệp của bạn → Skill tạo folder structure + SOP
 
-# Xay AI Workforce cho task cu the
+# Xây AI Workforce cho task cụ thể
 /vibe-aiworkforce
-→ Mo ta task can tu dong hoa → Skill thiet ke workforce
-
-# Dieu phoi task den dung nguoi
-/vibe-aiworkforce-gps
-→ Nhan task tu nhien → Route den dung department + SOP
+→ Mô tả task cần tự động hóa → Skill thiết kế workforce
 ```
 
 ---
 
-## Cau truc moi Skill
+## Cấu trúc mỗi Skill
 
 ```
 vibe-aiworkforce/
-├── SKILL.md                    ← File chinh — dinh nghia skill
-├── 05-templates/               ← Mau cho workforce design
+├── SKILL.md                    ← File chính — định nghĩa skill
+├── 05-templates/               ← Mẫu cho workforce design
 │   ├── workforce-analysis.md
 │   ├── skills-spec-template.md
 │   ├── rules-tests-template.md
 │   └── workflow-template.md
-├── 06-examples/                ← Vi du thuc te
+├── 06-examples/                ← Ví dụ thực tế
 │   └── example-content-marketing.md
-└── resources/                  ← Tai lieu tham khao
+└── resources/                  ← Tài liệu tham khảo
     └── description-anti-patterns.md
 
 vibe-company-orchestrator/
-└── SKILL.md                    ← File chinh
-
-vibe-aiworkforce-gps/
-└── SKILL.md                    ← File chinh
+└── SKILL.md                    ← File chính
 ```
 
 ---
 
-## Cap nhat
+## Cập nhật
 
 ```bash
-# Cap nhat tu repo moi nhat
+# Cập nhật từ repo mới nhất
 cd ai_native_company/community_version
 git pull
 
-# Copy lai skills
+# Copy lại skills
 cp -r skills/vibe-aiworkforce ~/.claude/skills/
 cp -r skills/vibe-company-orchestrator ~/.claude/skills/
-cp -r skills/vibe-aiworkforce-gps ~/.claude/skills/
 ```
 
 ---
 
-## Van de thuong gap
+## Vấn đề thường gặp
 
-### Skill khong xuat hien trong danh sach
+### Skill không xuất hiện trong danh sách
 
 ```bash
-# Kiem tra duong dan
+# Kiểm tra đường dẫn
 ls ~/.claude/skills/vibe-*/SKILL.md
 
-# Neu khong thay → tao thu muc
+# Nếu không thấy → tạo thư mục
 mkdir -p ~/.claude/skills
-# Copy lai skills
+# Copy lại skills
 ```
 
-### Skill trigger khong dung
+### Skill trigger không đúng
 
-Moi skill co phan "description" trong frontmatter SKILL.md. Claude Code su dung description de quyet dinh khi nao goi skill. Neu skill khong trigger:
+Mỗi skill có phần "description" trong frontmatter SKILL.md. Claude Code sử dụng description để quyết định khi nào gọi skill. Nếu skill không trigger:
 
-1. Doc phan "When to Use" trong SKILL.md
-2. Su dung dung tu khoa mo ta task
-3. Go ten skill truc tiep: `/vibe-aiworkforce`
+1. Đọc phần "When to Use" trong SKILL.md
+2. Sử dụng đúng từ khóa mô tả task
+3. Gõ tên skill trực tiếp: `/vibe-aiworkforce`
 
-### Loi permission
+### Lỗi permission
 
 ```bash
-# Dam bao quyen doc viet
+# Đảm bảo quyền đọc viết
 chmod -R 755 ~/.claude/skills/vibe-*/
 ```
 
@@ -164,14 +151,30 @@ chmod -R 755 ~/.claude/skills/vibe-*/
 
 ## Skills cho company folder (COMPANY_ROOT)
 
-**QUAN TRONG:** Khi build skills cho doanh nghiep cu the, skills phai luu TRONG company folder — khong chi o `~/.claude/skills/`.
+**QUAN TRỌNG:** Khi build skills cho doanh nghiệp cụ thể, skills phải lưu TRONG company folder — không chỉ ở `~/.claude/skills/`.
 
 ```
-# VI TRI CHINH (PRIMARY):
+# VỊ TRÍ CHÍNH (PRIMARY):
 [your-company]/[department]/ai_workforce/[skill-name]/SKILL.md
 
-# VI TRI GOI TU CLI (SECONDARY — copy hoac symlink):
+# VỊ TRÍ GỌI TỪ CLI (SECONDARY — copy hoặc symlink):
 ~/.claude/skills/[skill-name]/SKILL.md
 ```
 
-Skill `vibe-aiworkforce` se tu dong quan ly dieu nay khi ban cung cap `COMPANY_ROOT`.
+Skill `vibe-aiworkforce` sẽ tự động quản lý điều này khi bạn cung cấp `COMPANY_ROOT`.
+
+---
+
+## Cài đặt trên nhiều nền tảng
+
+Xem hướng dẫn đầy đủ cho Claude Code, Antigravity, OpenClaw, Codex tại [docs/install-guide.md](../docs/install-guide.md).
+
+Hoặc chạy script cài đặt tự động:
+
+```bash
+# macOS / Linux
+bash src/install.sh
+
+# Windows (PowerShell)
+powershell -ExecutionPolicy Bypass -File src\install.ps1
+```

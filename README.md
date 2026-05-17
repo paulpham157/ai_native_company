@@ -1,6 +1,6 @@
 # AI Native Company — Community Edition
 
-> **Mo hinh tu dong hoa van hanh doanh nghiep bang A.I Workforce — toi uu cho Solopreneur va SMEs.**
+> **Mô hình tự động hóa vận hành doanh nghiệp bằng A.I Workforce — tối ưu cho Solopreneur và SMEs.**
 
 [![License: CC BY-NC-SA 4.0](https://img.shields.io/badge/License-CC%20BY--NC--SA%204.0-lightgrey.svg)](https://creativecommons.org/licenses/by-nc-sa/4.0/)
 [![Made in Vietnam](https://img.shields.io/badge/Made%20in-Vietnam%20%E2%9C%94-red)](https://en.wikipedia.org/wiki/Vietnam)
@@ -9,156 +9,143 @@
 
 ## Giới thiệu
 
-**AI Native Company** la mo hinh van hanh doanh nghiep moi, noi:
+**AI Native Company** là mô hình vận hành doanh nghiệp mới, nơi:
 
-- **1 nguoi** co the van hanh voi nang luc tuong duong **15-20 nguoi**
-- **AI Worker** khong phai cong cu — ma la **nhan su so** chuyen biet
-- **Chi phi van hanh giam 97%** nhung chat luong dau ra khong giam
-- **SOP + Skill = Con nguoi so** — moi AI worker co vai tro, trach nhiem, va KPI ro rang
+- **1 người** có thể vận hành với năng lực tương đương **15–20 người**
+- **AI Worker** không phải công cụ — mà là **nhân sự số** chuyên biệt
+- **Chi phí vận hành giảm 97%** nhưng chất lượng đầu ra không giảm
+- **SOP + Skill = Con người số** — mỗi AI worker có vai trò, trách nhiệm, và KPI rõ ràng
 
-Du an nay cung cap **cong cu va phuong phap** de bat cu Solopreneur hay SME nao cung co the:
+Dự án này cung cấp **công cụ và phương pháp** để bất kỳ Solopreneur hay SME nào cũng có thể:
 
-1. Thiet ke toan bo cau truc cong ty thanh folder structure + SOP markdown
-2. Xay dung AI Workforce chuyen biet cho tung phong ban
-3. Van hanh doanh nghiep bang AI 24/7 — con nguoi chi giam sat va quyet dinh
-
----
-
-## Nguoi sang tac
-
-**LOC DANG** — nguoi tien phong trong mo hinh One Person Company (OPC) tai Viet Nam.
-
-- 3+ nam kinh nghiem tu van chuyen doi AI cho 250+ doanh nghiep SMEs
-- Sang lap **AI Native Solutions (AINS)** — cong ty OPC thuc te, van hanh boi 1 nguoi + 10 AI Workers
-- Triet ly: *"Founder khong lam viec — Founder thiet ke cach lam viec."*
+1. Thiết kế toàn bộ cấu trúc công ty thành folder structure + SOP markdown
+2. Xây dựng AI Workforce chuyên biệt cho từng phòng ban
+3. Vận hành doanh nghiệp bằng AI 24/7 — con người chỉ giám sát và quyết định
 
 ---
 
-## Thu muc chinh
+## Người sáng tác
+
+**Lộc Đặng** — người tiên phong trong mô hình One Person Company (OPC) tại Việt Nam.
+
+- 3+ năm kinh nghiệm tư vấn chuyển đổi AI cho 250+ doanh nghiệp SMEs
+- Sáng lập **AI Native Solutions (AINS)** — công ty OPC thực tế, vận hành bởi 1 người + 10 AI Workers
+- Triết lý: *"Founder không làm việc — Founder thiết kế cách làm việc."*
+
+---
+
+## Thư mục chính
 
 ```
 community_version/
-├── README.md                    ← Ban dang doc
+├── README.md                    ← Bạn đang đọc
 ├── LICENSE                      ← CC BY-NC-SA 4.0
-├── CONTRIBUTING.md              ← Huong dong gop
-├── CHANGELOG.md                 ← Lich su thay doi
-├── CODE_OF_CONDUCT.md           ← Quy tac ung xu
-├── skills/                      ← Claude Skills san dung
-│   ├── vibe-aiworkforce/        ← Skill xay dung AI Workforce
-│   ├── vibe-company-orchestrator/ ← Skill thiet ke toan bo cong ty
-│   └── vibe-aiworkforce-gps/    ← Skill AI Chief of Staff
-├── docs/                        ← Ebook + tai lieu
-│   ├── ebook/                   ← Ebook day du (markdown)
-│   ├── docx/                    ← Ban DOCX
-│   └── images/                  ← Hinh anh minh hoa
-├── examples/                    ← Vi du thuc te
-│   ├── sample-company/          ← Cong ty mau AINS
-│   └── sample-second-brain/     ← Second Brain mau
-└── src/                         ← Scripts va cong cu
+├── CONTRIBUTING.md              ← Hướng đóng góp
+├── CHANGELOG.md                 ← Lịch sử thay đổi
+├── CODE_OF_CONDUCT.md           ← Quy tắc ứng xử
+├── skills/                      ← Claude Skills sẵn dùng
+│   ├── vibe-aiworkforce/        ← Skill xây dựng AI Workforce
+│   └── vibe-company-orchestrator/ ← Skill thiết kế toàn bộ công ty
+├── docs/                        ← Ebook + tài liệu
+│   ├── ebook/                   ← Ebook đầy đủ (markdown)
+│   ├── docx/                    ← Bản DOCX
+│   └── images/                  ← Hình ảnh minh họa
+├── examples/                    ← Ví dụ thực tế
+│   ├── sample-company/          ← Công ty mẫu AINS
+│   └── sample-second-brain/     ← Second Brain mẫu
+└── src/                         ← Scripts và công cụ
 ```
 
 ---
 
-## Bat dau nhanh
+## Bắt đầu nhanh
 
-### Yeu cau
+### Yêu cầu
 
-- **Claude Code** (CLI hoac IDE extension) — [cai dat tai day](https://claude.ai/code)
-- **Claude Pro/Max** hoac API key co Claude Sonnet 4+ tro len
+- **Claude Code** (CLI hoặc IDE extension) — [cài đặt tại đây](https://claude.ai/code)
+- **Claude Pro/Max** hoặc API key có Claude Sonnet 4+ trở lên
 
-### Cai dat Skills
+### Cài đặt Skills
 
 ```bash
 # 1. Clone repo
 git clone https://github.com/your-org/ai_native_company.git
 cd ai_native_company/community_version
 
-# 2. Copy skills vao Claude Code skills folder
+# 2. Copy skills vào Claude Code skills folder
 cp -r skills/vibe-aiworkforce ~/.claude/skills/
 cp -r skills/vibe-company-orchestrator ~/.claude/skills/
-cp -r skills/vibe-aiworkforce-gps ~/.claude/skills/
 
-# 3. Verify
+# 3. Xác minh
 ls ~/.claude/skills/vibe-*/SKILL.md
 ```
 
-### Su dung dau tien
+### Sử dụng đầu tiên
 
 ```
-# Trong Claude Code, go:
+# Trong Claude Code, gõ:
 
 /vibe-company-orchestrator
-→ Mo ta cong ty cua ban → Skill se tao toan bo folder structure + SOP
+→ Mô tả công ty của bạn → Skill sẽ tạo toàn bộ folder structure + SOP
 
 /vibe-aiworkforce
-→ Mo ta task can tu dong hoa → Skill se thiet ke AI Workforce
-
-/vibe-aiworkforce-gps
-→ Nhan bat ky task nao → Skill se route den dung department + SOP
+→ Mô tả task cần tự động hóa → Skill sẽ thiết kế AI Workforce
 ```
 
 ---
 
-## 3 Skill chinh
+## 2 Skill chính
 
 ### 1. vibe-company-orchestrator
 
-**Thiet ke toan bo cong ty thanh he thong.**
+**Thiết kế toàn bộ công ty thành hệ thống.**
 
-- Triet ly "Tran sao am vay" — sao chep mo hinh cong ty thuc te
-- 3 Layer Architecture: Chien luoc / Van hanh / Ho tro
-- Tu folder trong → sinh ra toan bo company structure + SOP markdown
-- Tich hop Porter Value Chain, Archimate, IPO, RACI
+- Triết lý "Trần sao âm vậy" — sao chép mô hình công ty thực tế
+- 3 Layer Architecture: Chiến lược / Vận hành / Hỗ trợ
+- Từ folder trống → sinh ra toàn bộ company structure + SOP markdown
+- Tích hợp Porter Value Chain, Archimate, IPO, RACI
 
 ### 2. vibe-aiworkforce
 
-**Chuyen hoa task/workflow thanh nhan su so hoan chinh.**
+**Chuyển hóa task/workflow thành nhân sự số hoàn chỉnh.**
 
 - KWSR Framework: Knowledge → Workflow → Skill → Rule
 - 5 Deliverables: Folder Structure + Workflow + Skills + Rules & Tests + SOP State Machine
 - Skill Quality Router: TEMPLATED / EXPERT-CLONE / GPS-ENHANCED
-- Tu dong build + install skills vao Claude Code
-
-### 3. vibe-aiworkforce-gps
-
-**AI Chief of Staff — dieu phoi task den dung nguoi.**
-
-- Nhan task tu nhien (Viet/Anh) → route den dung department
-- Enforce SOP compliance
-- Report ket qua theo template chuan
+- Tự động build + install skills vào Claude Code
 
 ---
 
-## Mo hinh chuyen doi A.I 1+1+N
+## Mô hình chuyển đổi A.I 1+1+N
 
 ```
-Giai doan 1: AI nhu cong cu (Tool Adoption)
+Giai đoạn 1: AI như công cụ (Tool Adoption)
     ↓
-Giai doan 2: AI workforce tu dong hoa quy trinh (Workflow Transformation)
+Giai đoạn 2: AI workforce tự động hóa quy trình (Workflow Transformation)
     ↓
-Giai doan 3: AI ket noi qua MCP/API (Process Integration)
+Giai đoạn 3: AI kết nối qua MCP/API (Process Integration)
     ↓
-Giai doan 4: Cong ty thiet ke cho AI tu dau (AI-Native Company)
+Giai đoạn 4: Công ty thiết kế cho AI từ đầu (AI-Native Company)
 ```
 
 ---
 
 ## KWSR Framework
 
-Moi phong ban co 4 lop to chuc chuan:
+Mỗi phòng ban có 4 lớp tổ chức chuẩn:
 
-| Lop | Thu muc | Noi dung |
+| Lớp | Thư mục | Nội dung |
 |-----|---------|----------|
-| **K**nowledge | `_knowledge/` | AI can BIET gi — charter, KPI, domain reference |
-| **W**orkflow | `_workflow/` | Cong viec CHAY the nao — SOP index, dependencies |
-| **S**kill | `_skills-agents/` | AI CO THE lam gi — worker roster, capability matrix |
-| **R**ule | `_rules/` | AI KHONG DUOC lam gi — policies, quality gates, escalation |
+| **K**nowledge | `_knowledge/` | AI cần BIẾT gì — charter, KPI, domain reference |
+| **W**orkflow | `_workflow/` | Công việc CHẠY thế nào — SOP index, dependencies |
+| **S**kill | `_skills-agents/` | AI CÓ THỂ làm gì — worker roster, capability matrix |
+| **R**ule | `_rules/` | AI KHÔNG ĐƯỢC làm gì — policies, quality gates, escalation |
 
 ---
 
 ## SOP State Machine
 
-Moi SOP co 5 trang thai chuan:
+Mỗi SOP có 5 trạng thái chuẩn:
 
 ```
 template/  →  input/  →  processing/  →  output/  →  archive/
@@ -167,40 +154,40 @@ template/  →  input/  →  processing/  →  output/  →  archive/
 
 ---
 
-## Tai lieu
+## Tài liệu
 
-- **Ebook day du**: `docs/ebook/` — "Huong dan van hanh OPC cung A.I Workforce v1.2"
-- **Ban DOCX**: `docs/docx/`
-- **Cong ty mau**: `examples/sample-company/`
-
----
-
-## Dong gop
-
-Xem [CONTRIBUTING.md](CONTRIBUTING.md) de biet cach dong gop.
+- **Ebook đầy đủ**: `docs/ebook/` — "Hướng dẫn vận hành OPC cùng A.I Workforce v1.2"
+- **Bản DOCX**: `docs/docx/`
+- **Công ty mẫu**: `examples/sample-company/`
 
 ---
 
-## Giay phep
+## Đóng góp
 
-Du an nay su dung giay phep **Creative Commons Attribution-NonCommercial-ShareAlike 4.0 International (CC BY-NC-SA 4.0)**.
-
-- **Cho phep**: Chia se, sua doi, phan phat trong moi moi truong
-- **Dieu kien**: Ghi nguoi sang tac LOC DANG, khong dung muc dich thuong mai, chia se cung giay phep
-- **Muc dich thuong mai**: Lien he locdang.com de thoa thuan giay phep thuong mai
-
-Xem file [LICENSE](LICENSE) de biet them chi tiet.
+Xem [CONTRIBUTING.md](CONTRIBUTING.md) để biết cách đóng góp.
 
 ---
 
-## Lien he
+## Giấy phép
+
+Dự án này sử dụng giấy phép **Creative Commons Attribution-NonCommercial-ShareAlike 4.0 International (CC BY-NC-SA 4.0)**.
+
+- **Cho phép**: Chia sẻ, sửa đổi, phân phát trong mọi môi trường
+- **Điều kiện**: Ghi người sáng tác Lộc Đặng, không dùng mục đích thương mại, chia sẻ cùng giấy phép
+- **Mục đích thương mại**: Liên hệ locdang.com để thỏa thuận giấy phép thương mại
+
+Xem file [LICENSE](LICENSE) để biết thêm chi tiết.
+
+---
+
+## Liên hệ
 
 - **Website**: [locdang.com](https://locdang.com)
-- **Email**: Lien he qua website
-- **GitHub Issues**: De bao loi hoac de xuat cai thien
+- **Email**: Liên hệ qua website
+- **GitHub Issues**: Để báo lỗi hoặc đề xuất cải thiện
 
 ---
 
-*"Founder khong lam viec — Founder thiet ke cach lam viec."*
+*"Founder không làm việc — Founder thiết kế cách làm việc."*
 
-*— LOC DANG*
+*— Lộc Đặng*

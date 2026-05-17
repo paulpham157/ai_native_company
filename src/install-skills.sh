@@ -13,7 +13,7 @@ fi
 
 mkdir -p "$SKILLS_DST"
 
-SKILLS=("vibe-aiworkforce" "vibe-company-orchestrator" "vibe-aiworkforce-gps")
+SKILLS=("vibe-aiworkforce" "vibe-company-orchestrator")
 
 for skill in "${SKILLS[@]}"; do
   if [ -d "$SKILLS_SRC/$skill" ]; then
