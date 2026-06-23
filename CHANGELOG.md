@@ -7,7 +7,7 @@ và [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ---
 
-## [1.1.0] — 2026-06-22
+## [1.2] — 2026-06-22
 
 Bản nâng cấp **skills lên cấu trúc v2.0.0** — từ SKILL.md đơn lẻ sang package đầy đủ: schema contract, validator, hooks giảm hallucination, synthetic data và test suite.
 

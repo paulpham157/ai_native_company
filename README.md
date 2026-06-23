@@ -97,7 +97,7 @@ ls ~/.claude/skills/vibe-*/SKILL.md
 
 ## 2 Skill chính
 
-> Từ **v1.1.0**, mỗi skill không chỉ là `SKILL.md` đơn lẻ mà là **package đầy đủ v2.0.0**: schema contract (`schema/`), validator + anonymizer (`script/`), hooks giảm hallucination (`hooks.json`), test suite (`test/`), sample data (`synthetic-data/`), và metadata machine-readable (`skill.json`). Xem [CHANGELOG.md](CHANGELOG.md) để biết chi tiết.
+> Từ **v1.2**, mỗi skill không chỉ là `SKILL.md` đơn lẻ mà là **package đầy đủ v2.0.0**: schema contract (`schema/`), validator + anonymizer (`script/`), hooks giảm hallucination (`hooks.json`), test suite (`test/`), sample data (`synthetic-data/`), và metadata machine-readable (`skill.json`). Xem [CHANGELOG.md](CHANGELOG.md) để biết chi tiết.
 
 ### 1. vibe-company-orchestrator
 
