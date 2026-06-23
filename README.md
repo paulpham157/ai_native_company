@@ -121,6 +121,52 @@ ls ~/.claude/skills/vibe-*/SKILL.md
 
 ---
 
+## Nguyên lý thiết kế
+
+Hai skill không sinh ra để "generate template". Chúng được xây dựng xoay quanh một câu hỏi cốt lõi: **làm thế nào để AI Agent trở thành nhân sự số đáng tin cậy — kết quả lặp lại được, dễ kiểm soát, có thể audit?**
+
+Câu trả lời nằm ở **harness engineering**: một tầng kỹ thuật bọc quanh LLM, ép nó làm việc theo quy tắc, không bịa, không tự ý ghi đè, và xin ý kiến người ở những điểm chạm quan trọng. Đó chính là trọng tâm nâng cấp của **v1.2**.
+
+### vibe-company-orchestrator — 5 trụ cột
+
+| Trụ | Ý nghĩa |
+|-----|---------|
+| **Trần sao âm vậy** | Sao chép tối đa mô hình công ty thực tế đã proven, không phát minh lại bánh xe (tham chiếu ISO 9001, COBIT, COSO, PMBOK) |
+| **Explicit Thinking** | Mọi thứ tường minh — mục tiêu, input, output, quyết định, KPI, vai trò — không assumption ngầm |
+| **IPO Value Chain (recursive)** | Công ty = chuỗi mắt xích `Input → Process → Output`. Mở rộng bằng **ICOM**: Input, Control, ràng buộc, Output, Mechanism. Phân rã đệ quy: Company → Department → Process → Task |
+| **Archimate + Porter** | 3 lớp: Chiến lược / Vận hành / Hỗ trợ. Mỗi hoạt động là mắt xích chuỗi giá trị |
+| **SOP-first** | Mọi quy trình đều có SOP markdown, liên kết chặt, dùng được ngay — giao cho team người hoặc AI workforce |
+
+> Đầu ra: từ folder trống → sinh ra toàn bộ cấu trúc công ty + SOP, mỗi phòng ban có charter, OKR, RACI, và quality standards (SLI/SLO/SLA).
+
+### vibe-aiworkforce — nguyên lý tổ chức nhân sự số
+
+- **Mỗi skill = một nhân viên chuyên biệt** với role, responsibility, KPI rõ ràng
+- **Orchestrator = Manager** — điều phối, không tự execute
+- **Workflow = SOP** — quy trình chuẩn, audit được, cải tiến được
+- **Rules = Company Policy** — không thương lượng, phải enforce
+- **Tests = QA/HR Review** — tự động + thủ công, không skip
+
+Mỗi nhân sự số có 4 lớp tổ chức (KWSR) và phải tuân thủ **8 thành phần bắt buộc**: `SKILL.md` + `skill.json` + `kb/` + `prompt/` + `schema/` + `script/` + `test/` + `synthetic-data/` (+ `hooks.json`).
+
+### Harness layer (v1.2) — 7 cơ chế tin cậy
+
+Đây là phần giúp "công ty số" vận hành **đáng tin cậy** thay vì chỉ "đẹp trên giấy":
+
+| Cơ chế | Vấn đề giải quyết |
+|--------|-------------------|
+| **Schema cho mọi data I/O** | Ép output có cấu trúc cố định → AI không tùy tiện đổi format |
+| **Evidence + confidence_score** | Mỗi khẳng định phải kèm bằng chứng trích nguyên văn + điểm tin cậy (ngưỡng 0.7) → chống bịa |
+| **Validator (deterministic)** | Kiểm tra artifact theo schema bằng phương pháp tất định → giảm hallucination |
+| **Execution log** | Ghi lại mọi action (`execution_log.jsonl`) → audit trail đầy đủ |
+| **PII anonymizer** | Tự lọc thông tin nhạy cảm / API key trước khi dữ liệu đi vào AI |
+| **HITL review queue** | Xin ý kiến người ở các điểm chạm quan trọng (`need_review`) |
+| **Hooks bảo vệ** | Chặn AI ghi đè `template/` (chỉ đọc) và `archive/` (bất biến) |
+
+Cùng với các ưu điểm truyền thống của v1 — vận hành theo **SOP State Machine**, quản lý chất lượng theo **SLI/SLO**, quản trị mục tiêu theo **OKR** — bộ khung này biến mỗi AI worker thành một "con người số" có vai trò, trách nhiệm, quy trình, chất lượng, kiến thức và mục tiêu rõ ràng: **SOP + SLI + KPI + Knowledge + Skill = Con người số.**
+
+---
+
 ## Mô hình chuyển đổi A.I 1+1+N
 
 ```
