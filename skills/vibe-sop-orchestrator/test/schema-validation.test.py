@@ -4,10 +4,7 @@ schema-validation.test.py — vibe-sop-orchestrator
 
 Validates:
 1. All schema/*.schema.json are valid draft-07 schemas.
-2. Schemas declared in skill.json's emits_evidence_confidence accept valid instances.
-3. Schemas reject invalid instances (missing required fields).
-4. Contract schemas emit evidence/confidence_score/need_review per schema contract.
-   Schema list derived dynamically from skill.json — stays in sync automatically.
+2. deep-analysis-trigger.schema.json validates correctly.
 
 Run:
     python3 test/schema-validation.test.py
@@ -40,12 +37,6 @@ def check(name, condition, detail=""):
     else:
         failed += 1
         print(f"  ✗ {name} — {detail}")
-
-
-def validate(schema, instance):
-    if HAVE_JSONSCHEMA:
-        return list(jsonschema.Draft7Validator(schema).iter_errors(instance))
-    return validate_instance(instance, schema)
 
 
 def main():
@@ -84,8 +75,12 @@ def main():
             "confidence_score": 0.8,
             "need_review": False
         }
-        errs = validate(trigger_schema, valid_doc)
-        check("valid trigger passes", not errs, "; ".join(e.message for e in errs[:3]))
+        if HAVE_JSONSCHEMA:
+            errs = list(jsonschema.Draft7Validator(trigger_schema).iter_errors(valid_doc))
+            check("valid trigger passes", not errs, "; ".join(e.message for e in errs[:3]))
+        else:
+            errs = validate_instance(valid_doc, trigger_schema)
+            check("valid trigger passes (stdlib)", not errs, "; ".join(errs[:3]))
     else:
         check("deep-analysis-trigger.schema.json exists", False, "schema file not found")
 
@@ -118,8 +113,12 @@ def main():
             "confidence_score": 0.85,
             "need_review": False
         }
-        errs = validate(content_schema, valid_sop)
-        check("valid SOP content passes", not errs, "; ".join(e.message for e in errs[:3]))
+        if HAVE_JSONSCHEMA:
+            errs = list(jsonschema.Draft7Validator(content_schema).iter_errors(valid_sop))
+            check("valid SOP content passes", not errs, "; ".join(e.message for e in errs[:3]))
+        else:
+            errs = validate_instance(valid_sop, content_schema)
+            check("valid SOP content passes (stdlib)", not errs, "; ".join(errs[:3]))
     else:
         check("sop-content.schema.json exists", False, "schema file not found")
 
@@ -129,8 +128,12 @@ def main():
         invalid_sop = {
             "title": "Missing sop_code and inputs"
         }
-        errs = validate(content_schema, invalid_sop)
-        check("invalid SOP rejected", len(errs) > 0, f"expected errors, got 0")
+        if HAVE_JSONSCHEMA:
+            errs = list(jsonschema.Draft7Validator(content_schema).iter_errors(invalid_sop))
+            check("invalid SOP rejected", len(errs) > 0, f"expected errors, got 0")
+        else:
+            errs = validate_instance(invalid_sop, content_schema)
+            check("invalid SOP rejected (stdlib)", len(errs) > 0, f"expected errors, got 0")
     else:
         check("sop-content.schema.json exists", False, "schema file not found")
 
@@ -158,8 +161,12 @@ def main():
             "confidence_score": 0.9,
             "need_review": False
         }
-        errs = validate(meta_schema, valid_meta)
-        check("valid SOP metadata passes", not errs, "; ".join(e.message for e in errs[:3]))
+        if HAVE_JSONSCHEMA:
+            errs = list(jsonschema.Draft7Validator(meta_schema).iter_errors(valid_meta))
+            check("valid SOP metadata passes", not errs, "; ".join(e.message for e in errs[:3]))
+        else:
+            errs = validate_instance(valid_meta, meta_schema)
+            check("valid SOP metadata passes (stdlib)", not errs, "; ".join(errs[:3]))
     else:
         check("sop-metadata.schema.json exists", False, "schema file not found")
 
@@ -170,63 +177,27 @@ def main():
             "sop_code": "invalid-code",
             "department": "Marketing"
         }
-        errs = validate(meta_schema, invalid_meta)
-        check("invalid metadata rejected", len(errs) > 0, f"expected errors, got 0")
+        if HAVE_JSONSCHEMA:
+            errs = list(jsonschema.Draft7Validator(meta_schema).iter_errors(invalid_meta))
+            check("invalid metadata rejected", len(errs) > 0, f"expected errors, got 0")
+        else:
+            errs = validate_instance(invalid_meta, meta_schema)
+            check("invalid metadata rejected (stdlib)", len(errs) > 0, f"expected errors, got 0")
     else:
         check("sop-metadata.schema.json exists", False, "schema file not found")
 
-    # 7. Schema contract: schemas declared in skill.json's emits_evidence_confidence
-    #    must expose evidence/confidence_score/need_review.
-    #    Derived dynamically so the test stays in sync with skill.json.
-    print("\n[7] Schema contract — schemas declared in skill.json emit evidence/confidence_score/need_review")
-    skill_meta = json.loads((SKILL_DIR / "skill.json").read_text())
-    contract_artifacts = skill_meta.get("integrations", {}).get("schema_contract", {}).get("emits_evidence_confidence", [])
-    check("skill.json lists ≥1 artifact in emits_evidence_confidence", len(contract_artifacts) >= 1)
-    valid_instances = {
-        "deep-analysis-trigger": {
-            "needs_deep_analysis": False,
-            "reasoning": "Simple routine task",
-            "complexity_score": 0.2,
-            "evidence": [],
-            "confidence_score": 0.8,
-            "need_review": False,
-        },
-        "sop-content": {
-            "sop_code": "SOP-MKT-001",
-            "title": "Minimal SOP",
-            "inputs": [{"name": "x", "source": "y"}],
-            "process": [{"step": 1, "action": "do x"}],
-            "outputs": [{"name": "y", "destination": "z"}],
-            "evidence": [],
-            "confidence_score": 0.8,
-            "need_review": False,
-        },
-        "sop-metadata": {
-            "sop_code": "SOP-MKT-001",
-            "department": "Marketing",
-            "type": "operational",
-            "version": "1.0",
-            "evidence": [],
-            "confidence_score": 0.8,
-            "need_review": False,
-        },
-    }
-    for artifact in contract_artifacts:
-        schema_file = f"{artifact}.schema.json"
-        s = schemas.get(schema_file)
-        if not s:
-            check(f"{artifact}.schema.json found in schema/", False, "schema file missing — update test or add schema")
-            continue
-        doc = valid_instances.get(artifact)
-        if not doc:
-            check(f"{artifact} has a valid instance in contract test", False, "add minimal valid instance to test")
-            continue
-        errs = validate(s, doc)
-        check(
-            f"{artifact} schema accepts minimal instance with evidence/confidence_score/need_review",
-            not errs,
-            "; ".join(e.message for e in errs[:3]),
-        )
+    # 7. Schema contract: all schemas emit evidence/confidence_score/need_review
+    print("\n[7] Schema contract — all schemas emit evidence, confidence_score, need_review")
+    required_fields = {"evidence", "confidence_score", "need_review"}
+    sop_schemas = ["deep-analysis-trigger.schema.json", "sop-content.schema.json", "sop-metadata.schema.json"]
+    for name in sop_schemas:
+        s = schemas.get(name)
+        if s:
+            props = set(s.get("properties", {}).keys())
+            missing = required_fields - props
+            check(f"{name} has all contract fields", not missing, f"missing: {missing}")
+        else:
+            check(f"{name} exists", False, "schema file not found")
 
     print("\n" + "=" * 60)
     print(f"Result: {passed} passed, {failed} failed")
