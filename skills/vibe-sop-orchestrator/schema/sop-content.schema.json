@@ -1,0 +1,84 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "sop-content.schema.json",
+  "title": "SOP Content",
+  "description": "Nội dung chính của một SOP — IPO + ICOM structure. Validate SOP markdown artifact trước khi emit.",
+  "type": "object",
+  "required": ["sop_code", "title", "inputs", "process", "outputs", "evidence", "confidence_score", "need_review"],
+  "properties": {
+    "sop_code": {"type": "string", "pattern": "^SOP-[A-Z0-9]{3}-\\d{3}$"},
+    "title": {"type": "string", "minLength": 5},
+    "version": {"type": "string", "pattern": "^\\d+\\.\\d+$"},
+    "inputs": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["name", "source"],
+        "properties": {
+          "name": {"type": "string"},
+          "source": {"type": "string", "description": "Department hoặc skill nào cung cấp input này"},
+          "format": {"type": "string", "enum": ["markdown", "json", "yaml", "csv"]}
+        }
+      }
+    },
+    "process": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["step", "action"],
+        "properties": {
+          "step": {"type": "integer", "minimum": 1},
+          "action": {"type": "string"},
+          "responsible": {"type": "string"},
+          "duration_estimate": {"type": "string"}
+        }
+      }
+    },
+    "outputs": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["name", "destination"],
+        "properties": {
+          "name": {"type": "string"},
+          "destination": {"type": "string", "description": "Department hoặc skill nào nhận output này"},
+          "format": {"type": "string", "enum": ["markdown", "json", "yaml", "csv"]}
+        }
+      }
+    },
+    "controls": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "name": {"type": "string"},
+          "standard": {"type": "string", "description": "Reference đến quality standard hoặc policy"}
+        }
+      }
+    },
+    "mechanisms": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "name": {"type": "string"},
+          "type": {"type": "string", "enum": ["tool", "system", "role", "skill"]}
+        }
+      }
+    },
+    "evidence": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["claim", "source"],
+        "properties": {
+          "claim": {"type": "string"},
+          "verbatim_quote": {"type": "string"},
+          "source": {"type": "string"}
+        }
+      }
+    },
+    "confidence_score": {"type": "number", "minimum": 0, "maximum": 1},
+    "need_review": {"type": "boolean"}
+  }
+}

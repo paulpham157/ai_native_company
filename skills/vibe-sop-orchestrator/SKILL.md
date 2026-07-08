@@ -80,15 +80,27 @@ Dùng cho SOPs complex, high impact, nhiều dependencies:
 
 ---
 
+## Script Reuse
+
+Scripts được symlink từ `vibe-company-orchestrator/script/` (xem ADR-0004):
+
+```
+script/validator.py → ../../vibe-company-orchestrator/script/validator.py
+```
+
+Shared schemas (`skill-meta.schema.json`, `aiworkforce-handoff-brief.schema.json`) cũng symlink tương tự để tránh duplication.
+
+---
+
 ## 8 Components
 
-| Component | Path |
-|-----------|------|
-| SKILL.md | `./SKILL.md` |
-| skill.json | `./skill.json` |
-| kb/ | `./kb/` |
-| script/ | `./script/` (symlinks) |
-| prompt/ | `./prompt/` |
-| schema/ | `./schema/` |
-| test/ | `./test/` |
-| synthetic-data/ | `./synthetic-data/` |
+| Component | Path | Notes |
+|-----------|------|-------|
+| SKILL.md | `./SKILL.md` | Core workflow & documentation |
+| skill.json | `./skill.json` | Machine-readable metadata |
+| kb/ | `./kb/` | Knowledge base (templates, rubrics) |
+| script/ | `./script/` | Symlinks từ vibe-company-orchestrator (ADR-0004) |
+| prompt/ | `./prompt/` | Prompt templates |
+| schema/ | `./schema/` | JSON schemas (SOP-specific + shared symlinks) |
+| test/ | `./test/` | Test suite |
+| synthetic-data/ | `./synthetic-data/` | Sample data cho testing |
