@@ -1,0 +1,5 @@
+{
+  "needs_deep_analysis": "maybe",
+  "complexity_score": 2.5,
+  "evidence": "missing required fields"
+}
