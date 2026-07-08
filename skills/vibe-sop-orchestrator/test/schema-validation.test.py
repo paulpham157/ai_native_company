@@ -22,18 +22,15 @@ import json
 import sys
 from pathlib import Path
 
-SKILL_DIR = Path(__file__).resolve().parent.parent
-sys.path.insert(0, str(SKILL_DIR / "script"))
+sys.path.insert(0, str(Path(__file__).resolve().parent.parent / "script"))
 
-try:
-    import jsonschema
-    HAVE_JSONSCHEMA = True
-except ImportError:
-    HAVE_JSONSCHEMA = False
-
-from validator import validate_instance
-
-SYNTHETIC_DIR = SKILL_DIR / "synthetic-data"
+from test_helpers import (
+    get_skill_dir,
+    load_fixture,
+    fixture_exists,
+    load_schemas,
+    validate,
+)
 
 passed = 0
 failed = 0
@@ -43,48 +40,28 @@ def check(name, condition, detail=""):
     global passed, failed
     if condition:
         passed += 1
-        print(f"  ✓ {name}")
+        print(f"  \u2713 {name}")
     else:
         failed += 1
-        print(f"  ✗ {name} — {detail}")
-
-
-def validate(schema, instance):
-    if HAVE_JSONSCHEMA:
-        return list(jsonschema.Draft7Validator(schema).iter_errors(instance))
-    return validate_instance(instance, schema)
-
-
-def load_fixture(name):
-    path = SYNTHETIC_DIR / f"{name}.json"
-    if not path.is_file():
-        raise FileNotFoundError(f"Fixture not found: {path}")
-    return json.loads(path.read_text())
-
-
-def fixture_exists(name):
-    return (SYNTHETIC_DIR / f"{name}.json").is_file()
+        print(f"  \u2717 {name} \u2014 {detail}")
 
 
 def main():
     global passed, failed
     print("=" * 60)
-    print("SCHEMA VALIDATION TEST — vibe-sop-orchestrator")
+    print("SCHEMA VALIDATION TEST \u2014 vibe-sop-orchestrator")
     print("=" * 60)
+
+    SKILL_DIR = get_skill_dir()
+    schemas = load_schemas()
 
     # 1. All schemas parse as valid JSON
     print("\n[1] Schemas parse as valid JSON")
     schema_files = sorted((SKILL_DIR / "schema").glob("*.schema.json"))
-    check("found ≥1 schema file", len(schema_files) >= 1, f"found {len(schema_files)}")
-    schemas = {}
+    check("found \u22651 schema file", len(schema_files) >= 1, f"found {len(schema_files)}")
     for sf in schema_files:
-        try:
-            schemas[sf.name] = json.loads(sf.read_text())
-            print(f"    ✓ {sf.name}")
-            passed += 1
-        except Exception as e:
-            print(f"    ✗ {sf.name} — {e}")
-            failed += 1
+        print(f"    \u2713 {sf.name}")
+        passed += 1
 
     # 2. deep-analysis-trigger validates a valid document
     print("\n[2] deep-analysis-trigger.schema.json validates valid document")
@@ -99,8 +76,20 @@ def main():
     else:
         check("deep-analysis-trigger.schema.json exists", False, "schema file not found")
 
-    # 3. sop-content validates a valid SOP document
-    print("\n[3] sop-content.schema.json validates valid SOP document")
+    # 3. deep-analysis-trigger rejects invalid document
+    print("\n[3] deep-analysis-trigger.schema.json rejects invalid document")
+    if trigger_schema:
+        if fixture_exists("deep-analysis-trigger-invalid"):
+            invalid_doc = load_fixture("deep-analysis-trigger-invalid")
+            errs = validate(trigger_schema, invalid_doc)
+            check("invalid trigger rejected", len(errs) > 0, f"expected errors, got 0")
+        else:
+            check("deep-analysis-trigger-invalid.json fixture exists", False)
+    else:
+        check("deep-analysis-trigger.schema.json exists", False, "schema file not found")
+
+    # 4. sop-content validates a valid SOP document
+    print("\n[4] sop-content.schema.json validates valid SOP document")
     content_schema = schemas.get("sop-content.schema.json")
     if content_schema:
         if fixture_exists("sop-content-valid"):
@@ -112,8 +101,8 @@ def main():
     else:
         check("sop-content.schema.json exists", False, "schema file not found")
 
-    # 4. sop-content rejects invalid document (missing required fields)
-    print("\n[4] sop-content.schema.json rejects invalid document")
+    # 5. sop-content rejects invalid document (missing required fields)
+    print("\n[5] sop-content.schema.json rejects invalid document")
     if content_schema:
         if fixture_exists("sop-content-invalid"):
             invalid_sop = load_fixture("sop-content-invalid")
@@ -124,8 +113,8 @@ def main():
     else:
         check("sop-content.schema.json exists", False, "schema file not found")
 
-    # 5. sop-metadata validates a valid metadata document
-    print("\n[5] sop-metadata.schema.json validates valid metadata")
+    # 6. sop-metadata validates a valid metadata document
+    print("\n[6] sop-metadata.schema.json validates valid metadata")
     meta_schema = schemas.get("sop-metadata.schema.json")
     if meta_schema:
         if fixture_exists("sop-metadata-valid"):
@@ -137,8 +126,8 @@ def main():
     else:
         check("sop-metadata.schema.json exists", False, "schema file not found")
 
-    # 6. sop-metadata rejects invalid metadata
-    print("\n[6] sop-metadata.schema.json rejects invalid metadata")
+    # 7. sop-metadata rejects invalid metadata
+    print("\n[7] sop-metadata.schema.json rejects invalid metadata")
     if meta_schema:
         if fixture_exists("sop-metadata-invalid"):
             invalid_meta = load_fixture("sop-metadata-invalid")
@@ -149,18 +138,18 @@ def main():
     else:
         check("sop-metadata.schema.json exists", False, "schema file not found")
 
-    # 7. Schema contract: schemas declared in skill.json's emits_evidence_confidence
+    # 8. Schema contract: schemas declared in skill.json's emits_evidence_confidence
     #    must expose evidence/confidence_score/need_review.
     #    Derived dynamically so the test stays in sync with skill.json.
-    print("\n[7] Schema contract — schemas declared in skill.json emit evidence/confidence_score/need_review")
+    print("\n[8] Schema contract \u2014 schemas declared in skill.json emit evidence/confidence_score/need_review")
     skill_meta = json.loads((SKILL_DIR / "skill.json").read_text())
     contract_artifacts = skill_meta.get("integrations", {}).get("schema_contract", {}).get("emits_evidence_confidence", [])
-    check("skill.json lists ≥1 artifact in emits_evidence_confidence", len(contract_artifacts) >= 1)
+    check("skill.json lists \u22651 artifact in emits_evidence_confidence", len(contract_artifacts) >= 1)
     for artifact in contract_artifacts:
         schema_file = f"{artifact}.schema.json"
         s = schemas.get(schema_file)
         if not s:
-            check(f"{artifact}.schema.json found in schema/", False, "schema file missing — update test or add schema")
+            check(f"{artifact}.schema.json found in schema/", False, "schema file missing \u2014 update test or add schema")
             continue
         fixture_name = f"{artifact}-minimal"
         if not fixture_exists(fixture_name):
