@@ -144,7 +144,7 @@ def main():
     print("\n[8] Schema contract \u2014 schemas declared in skill.json emit evidence/confidence_score/need_review")
     skill_meta = json.loads((SKILL_DIR / "skill.json").read_text())
     contract_artifacts = skill_meta.get("integrations", {}).get("schema_contract", {}).get("emits_evidence_confidence", [])
-    check("skill.json lists \u22651 artifact in emits_evidence_confidence", len(contract_artifacts) >= 1)
+    check("skill.json lists >=1 artifact in emits_evidence_confidence", len(contract_artifacts) >= 1)
     for artifact in contract_artifacts:
         schema_file = f"{artifact}.schema.json"
         s = schemas.get(schema_file)
