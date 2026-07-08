@@ -9,13 +9,14 @@
     "downstream": ["vibe-aiworkforce", "vibe-review"],
     "schema_contract": {
       "enforces_8_components": true,
-      "emits_evidence_confidence": ["sop-content", "sop-metadata"],
+      "emits_evidence_confidence": ["sop-content", "sop-metadata", "deep-analysis-trigger"],
       "handoff_brief_schema": "./schema/aiworkforce-handoff-brief.schema.json"
     }
   },
   "schemas": [
     "./schema/sop-content.schema.json",
-    "./schema/sop-metadata.schema.json"
+    "./schema/sop-metadata.schema.json",
+    "./schema/deep-analysis-trigger.schema.json"
   ],
   "guardrails": {
     "evidence_required": true,
