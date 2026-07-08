@@ -1,0 +1,36 @@
+{
+  "sop_code": "SOP-MKT-001",
+  "title": "Content Review Process",
+  "inputs": [
+    {"name": "Draft content", "source": "Content Writer", "format": "markdown"}
+  ],
+  "process": [
+    {
+      "step": 1,
+      "action": "Review draft for factual accuracy",
+      "responsible": "Editor",
+      "duration_estimate": "[DO_USER_SPECIFY]"
+    }
+  ],
+  "outputs": [
+    {"name": "Approved content", "destination": "Publishing", "format": "markdown"}
+  ],
+  "controls": [
+    {"name": "Quality Gate", "standard": "[DO_USER_SPECIFY]"}
+  ],
+  "mechanisms": [
+    {"name": "CMS", "type": "tool"}
+  ],
+  "evidence": [
+    {
+      "claim": "Process steps derived from MKT charter",
+      "verbatim_quote": "Content team follows review process",
+      "source": "MKT charter v2.1"
+    }
+  ],
+  "confidence_score": 0.75,
+  "need_review": false,
+  "deadline": "[DO_USER_SPECIFY]",
+  "sla": "[DO_USER_SPECIFY]",
+  "kpi_targets": "[DO_USER_SPECIFY]"
+}
