@@ -56,9 +56,8 @@ def main():
     # 1. Mode selection: weighted score >= 20 -> Deep mode
     print("\n[1] Mode selection rubric \u2014 Deep mode when score >= 20")
     rubric_path = SKILL_DIR / "kb" / "mode-selection-rubric.md"
-    rubric_text = rubric_path.read_text()
     check("mode-selection-rubric.md exists", rubric_path.is_file())
-
+    rubric_text = rubric_path.read_text() if rubric_path.is_file() else ""
     rubric_lines = rubric_text.splitlines()
     deep_threshold_lines = [
         line for line in rubric_lines
@@ -96,6 +95,7 @@ def main():
         if section.strip()
     ]
     check("SKILL.md has ## Deep Mode section", len(deep_mode_sections) >= 1)
+    deep_mode_text = "\n".join(deep_mode_sections).lower()
 
     # Check for specific workflow steps in Deep mode
     deep_workflow_keywords = [
@@ -107,7 +107,7 @@ def main():
     for kw in deep_workflow_keywords:
         check(
             f"Deep mode mentions '{kw}'",
-            kw.lower() in skill_text.lower(),
+            kw.lower() in deep_mode_text,
             f"'{kw}' not found in SKILL.md Deep mode section",
         )
 
@@ -120,7 +120,7 @@ def main():
     for phase in deep_workflow_phases:
         check(
             f"Deep mode workflow documents '{phase}' phase",
-            phase.lower() in skill_text.lower(),
+            phase.lower() in deep_mode_text,
             f"Expected Deep mode workflow to document '{phase}' in SKILL.md",
         )
 
@@ -132,9 +132,9 @@ def main():
     ]
     check("rubric mentions user override", len(override_mentions) >= 1)
 
-    override_in_skill = "override" in skill_text.lower()
-    check("SKILL.md mentions user override", override_in_skill,
-          "User override not mentioned in SKILL.md")
+    override_in_deep = "override" in deep_mode_text
+    check("Deep mode mentions user override", override_in_deep,
+          "User override not mentioned in Deep mode section")
 
     # 5. xthinking-handoff-brief schema — exists and validates
     print("\n[5] xthinking-handoff-brief \u2014 schema + handoff document")
@@ -184,16 +184,16 @@ def main():
     # 7. Critical parameters guard applies to Deep mode too
     print("\n[7] Critical parameters guard \u2014 applies to Deep mode")
     check(
-        "SKILL.md says Critical parameters guard applies to Deep mode",
-        "Critical parameters guard" in skill_text,
+        "Deep mode mentions Critical parameters guard",
+        "critical parameters guard" in deep_mode_text,
     )
     # Check that [DO_USER_SPECIFY] is mentioned in context of Deep mode
     critical_keywords = ["deadlines", "SLAs", "KPI targets", "DO_USER_SPECIFY"]
     for kw in critical_keywords:
         check(
             f"Deep mode mentions '{kw}' as blocked",
-            kw.lower() in skill_text.lower(),
-            f"'{kw}' not found in SKILL.md",
+            kw.lower() in deep_mode_text,
+            f"'{kw}' not found in Deep mode section",
         )
 
     # 8. Handoff to vibe-xthinking-orchestrator documented
@@ -205,9 +205,9 @@ def main():
     ]
     for kw in handoff_keywords:
         check(
-            f"SKILL.md documents handoff via '{kw}'",
-            kw.lower() in skill_text.lower(),
-            f"'{kw}' not found in SKILL.md",
+            f"Deep mode documents handoff via '{kw}'",
+            kw.lower() in deep_mode_text,
+            f"'{kw}' not found in Deep mode section",
         )
 
     handoff_schema_path = SKILL_DIR / "schema" / "xthinking-handoff-brief.schema.json"
