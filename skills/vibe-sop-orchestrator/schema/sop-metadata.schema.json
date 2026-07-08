@@ -1,0 +1,48 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "sop-metadata.schema.json",
+  "title": "SOP Metadata",
+  "description": "Metadata cho SOP — version history, classification, tags, ownership. Validate SOP index file.",
+  "type": "object",
+  "required": ["sop_code", "department", "type", "version"],
+  "properties": {
+    "sop_code": {"type": "string", "pattern": "^SOP-[A-Z0-9]{3}-\\d{3}$"},
+    "department": {"type": "string"},
+    "type": {"type": "string", "enum": ["operational", "documentation-only"]},
+    "version": {"type": "string", "pattern": "^\\d+\\.\\d+$"},
+    "title": {"type": "string"},
+    "owner": {"type": "string"},
+    "tags": {
+      "type": "array",
+      "items": {"type": "string"}
+    },
+    "dependencies": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "sop_code": {"type": "string"},
+          "relation": {"type": "string", "enum": ["precedes", "depends_on", "related_to"]}
+        }
+      }
+    },
+    "change_history": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "version": {"type": "string"},
+          "date": {"type": "string", "format": "date"},
+          "author": {"type": "string"},
+          "summary": {"type": "string"}
+        }
+      }
+    },
+    "evidence": {
+      "type": "array",
+      "items": {"type": "object"}
+    },
+    "confidence_score": {"type": "number", "minimum": 0, "maximum": 1},
+    "need_review": {"type": "boolean"}
+  }
+}

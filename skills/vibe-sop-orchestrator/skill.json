@@ -1,0 +1,27 @@
+{
+  "$schema": "./schema/skill-meta.schema.json",
+  "name": "vibe-sop-orchestrator",
+  "version": "2.0.0",
+  "type": "skill",
+  "description": "SOP Orchestrator - Tạo và quản lý Standard Operating Procedures (SOP) theo framework IPO (Input-Process-Output) với ICOM extension. Đồng bộ Schema & Guardrail contract với vibe-aiworkforce — emit evidence/confidence/need_review cho mọi artifact.",
+  "integrations": {
+    "upstream": ["vibe-company-orchestrator"],
+    "downstream": ["vibe-aiworkforce", "vibe-review"],
+    "schema_contract": {
+      "enforces_8_components": true,
+      "emits_evidence_confidence": ["sop-content", "sop-metadata", "deep-analysis-trigger"],
+      "handoff_brief_schema": "./schema/aiworkforce-handoff-brief.schema.json"
+    }
+  },
+  "schemas": [
+    "./schema/sop-content.schema.json",
+    "./schema/sop-metadata.schema.json",
+    "./schema/deep-analysis-trigger.schema.json"
+  ],
+  "guardrails": {
+    "evidence_required": true,
+    "confidence_threshold": 0.7,
+    "hooks_protected_paths": ["template/", "archive/"],
+    "execution_log": "output/execution_log.jsonl"
+  }
+}

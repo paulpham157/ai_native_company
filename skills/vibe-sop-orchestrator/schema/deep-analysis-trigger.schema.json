@@ -1,0 +1,60 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "deep-analysis-trigger.schema.json",
+  "title": "Deep Analysis Trigger",
+  "description": "Decision output cho SOP mode selection — xác định xem SOP cần Quick mode (clone template) hay Deep mode (phân tích qua vibe-xthinking-orchestrator).",
+  "type": "object",
+  "required": [
+    "needs_deep_analysis",
+    "reasoning",
+    "complexity_score",
+    "evidence",
+    "confidence_score",
+    "need_review"
+  ],
+  "properties": {
+    "needs_deep_analysis": {
+      "type": "boolean",
+      "description": "True nếu SOP yêu cầu Deep mode (phân tích domain sâu)"
+    },
+    "reasoning": {
+      "type": "string",
+      "description": "Lý do chi tiết cho decision — dựa trên mode selection rubric"
+    },
+    "complexity_score": {
+      "type": "number",
+      "minimum": 0,
+      "maximum": 1,
+      "description": "Điểm phức tạp của SOP: 0 = đơn giản, 1 = rất phức tạp"
+    },
+    "cross_department_count": {
+      "type": "integer",
+      "minimum": 1,
+      "description": "Số department liên quan"
+    },
+    "risk_level": {
+      "type": "string",
+      "enum": ["low", "medium", "high"],
+      "description": "Mức độ rủi ro nếu SOP sai"
+    },
+    "evidence": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["claim", "source"],
+        "properties": {
+          "claim": {"type": "string"},
+          "source": {"type": "string"}
+        }
+      }
+    },
+    "confidence_score": {
+      "type": "number",
+      "minimum": 0,
+      "maximum": 1
+    },
+    "need_review": {
+      "type": "boolean"
+    }
+  }
+}
