@@ -195,12 +195,130 @@ Xem `prompt/quick-mode-sop.md` cho instruction chi tiết gửi AI khi chạy Qu
 
 ## Deep Mode
 
-Dùng cho SOPs complex, high impact, nhiều dependencies:
+> **"When to use:** SOPs complex, high impact, nhiều dependencies, cần domain expertise. Refer to `kb/mode-selection-rubric.md` — tổng weighted score >= 20."
+> **"Gọi vibe-xthinking-orchestrator phân tích domain sâu trước khi generate SOP. Handoff qua `schema/xthinking-handoff-brief.schema.json`."**
 
-1. Gọi vibe-xthinking-orchestrator phân tích industry/domain
-2. Generate SOP dựa trên analysis
-3. Cross-reference với existing knowledge base
-4. Validate + emit evidence/confidence/need_review
+### Workflow
+
+```
+ 1. GATHERING — Collect charter + OKRs + KB context (same as Quick mode)
+    │
+ 2. MODE SELECTION — Run mode-selection-rubric → Deep mode (score >= 20)
+    │
+ 3. HANDOFF PREP (Bàn giao) — Build xthinking-handoff-brief with context + SOP requirements
+    │
+ 4. XTHINKING ANALYSIS — Gọi vibe-xthinking-orchestrator, nhận analysis result
+    │
+ 5. SOP GENERATION — Generate SOP từ analysis + templates. Leave critical params BLANK.
+    │
+ 6. USER REVIEW — User reviews + fills critical params
+    │
+ 7. VALIDATE — Validate qua sop-content.schema.json + sop-metadata.schema.json
+    │
+ 8. EMIT — Emit evidence/confidence_score/need_review
+```
+
+### Step-by-Step
+
+#### Step 1: Gather Information
+Collect từ user hoặc existing docs:
+- **Department charter** — inputs, process, outputs, controls, mechanisms
+- **Department OKRs** — objectives và key results liên quan SOP
+- **Existing KB** — `kb/` files for domain context (industry templates, naming conventions)
+
+Output: structured context object — same as Quick mode.
+
+#### Step 2: Mode Selection
+Chạy `kb/mode-selection-rubric.md`:
+- Tính weighted score dựa trên complexity, cross-department, risk, regulatory
+- Score >= 20 → Deep mode. Score < 20 → suggest Quick mode (user override allowed)
+- Emit `deep-analysis-trigger` artifact theo `schema/deep-analysis-trigger.schema.json`
+- Record reasoning + evidence vào artifact
+
+**User override:** Luôn allowed. Ghi nhận lý do vào evidence:
+```json
+{
+  "claim": "User override: Deep mode despite Quick recommendation",
+  "verbatim_quote": "Tôi muốn phân tích sâu dù SOP đơn giản",
+  "source": "user conversation"
+}
+```
+
+#### Step 3: Prepare XThinking Handoff (Chuẩn bị bàn giao)
+Build `xthinking-handoff-brief` document theo `schema/xthinking-handoff-brief.schema.json`:
+
+| Field | Source |
+|-------|--------|
+| `request_id` | SOP code + timestamp |
+| `department` | Charter department slug |
+| `analysis_type` | `"topic"` (domain analysis cho SOP) |
+| `context.charter_summary` | Charter tóm tắt |
+| `context.okr_summary` | OKRs tóm tắt |
+| `context.industry_context` | Industry context từ KB |
+| `sop_requirements.title` | SOP title |
+| `sop_requirements.type` | `operational` / `documentation-only` |
+| `sop_requirements.key_questions` | Questions cần xthinking phân tích |
+| `deep_analysis_trigger` | Copy từ Step 2 artifact |
+| `evidence` | Gathered evidence |
+| `confidence_score` | Từ deep-analysis-trigger |
+| `need_review` | False (unless low confidence) |
+
+Handoff document này là input cho vibe-xthinking-orchestrator.
+
+#### Step 4: XThinking Analysis (Handoff Point — Điểm bàn giao)
+Gửi handoff brief đến vibe-xthinking-orchestrator:
+```
+vibe-xthinking-orchestrator
+  ── analysis_type: "topic"
+  ── context: charter + OKRs + industry
+  ── key_questions: list of specific questions
+  ── returns: topic-analysis.schema.json
+```
+
+Analysis result bao gồm:
+- Explicit thinking outline (assumptions, logic chain, gaps)
+- Value chain analysis (Porter, IPO decomposition)
+- Actionable insights cho SOP generation
+- Evidence/confidence_score/need_review
+
+#### Step 5: SOP Generation
+Dựa trên analysis result + charter + OKRs:
+1. **Pick template** — từ `kb/templates/` hoặc `kb/industry-sop-templates/`
+2. **Fill IPO+ICOM** — từ charter + analysis insights
+3. **Cross-reference** — với analysis insights và KB
+4. **Critical parameters BLOCKED** — để `[DO_USER_SPECIFY]`
+
+Template fields (same as Quick mode, see Step 4 in Quick mode):
+
+| Template Field | Source | AI tự fill? |
+|---------------|--------|-------------|
+| `{{SOP_TITLE}}` | Charter title | Yes |
+| `{{SOP_CODE}}` | Generated | Yes (propose, user approves) |
+| ... (same as Quick mode) | | |
+| **Critical params** | User | **BLOCKED** |
+
+#### Step 6: User Review
+Present filled SOP + analysis highlights cho user:
+- Show analysis summary từ vibe-xthinking-orchestrator
+- Highlight [DO_USER_SPECIFY] fields cần user input
+- User edits/adjusts, đặc biệt critical parameters
+- Ghi nhận user's verbatim quotes → evidence
+
+Review loop (same as Quick mode):
+```
+1. AI: present draft SOP + analysis summary + highlight [DO_USER_SPECIFY] fields
+2. User: review, adjust, fill critical params
+3. AI: record changes + update evidence
+4. Repeat until user approves
+```
+
+#### Step 7: Schema Validation
+Validate output qua:
+- `schema/sop-content.schema.json` — content structure
+- `schema/sop-metadata.schema.json` — metadata
+
+#### Step 8: Emit
+Emit SOP artifact với đầy đủ evidence/confidence_score/need_review (same format as Quick mode).
 
 > **Critical parameters guard cũng áp dụng cho Deep mode** — AI không tự điền deadlines, SLAs, KPI targets.
 
@@ -225,7 +343,7 @@ Xem chi tiết tại `kb/mode-selection-rubric.md`. Tóm tắt:
 ## Schema Contract
 
 - `emits_evidence_confidence`: sop-content, sop-metadata, deep-analysis-trigger
-- `handoff_brief_schema`: schema/aiworkforce-handoff-brief.schema.json
+- `handoff_brief_schema`: schema/xthinking-handoff-brief.schema.json
 - `confidence_threshold`: 0.7
 
 ---

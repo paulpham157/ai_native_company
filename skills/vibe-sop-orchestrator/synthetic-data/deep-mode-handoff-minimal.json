@@ -1,0 +1,27 @@
+{
+  "request_id": "SOP-ENG-001-20260708",
+  "department": "Engineering",
+  "analysis_type": "topic",
+  "context": {
+    "charter_summary": "Engineering team builds and maintains platform",
+    "okr_summary": "Improve deployment frequency"
+  },
+  "sop_requirements": {
+    "title": "Deployment Process",
+    "type": "operational"
+  },
+  "deep_analysis_trigger": {
+    "needs_deep_analysis": true,
+    "reasoning": "Complex deployment pipeline across multiple services",
+    "complexity_score": 0.7
+  },
+  "evidence": [
+    {
+      "claim": "Multi-service deployment",
+      "verbatim_quote": "We deploy 12 microservices",
+      "source": "ENG charter"
+    }
+  ],
+  "confidence_score": 0.75,
+  "need_review": true
+}

@@ -14,7 +14,7 @@
 
 ### 1. Gather Information
 
-Read department charter + OKRs + existing KB files để hiểu domain. Trích verbatim quote cho evidence.
+Read department charter + OKRs + existing KB files để hiểu domain. Trích verbatim quotes cho evidence.
 
 ### 2. Mode Selection
 

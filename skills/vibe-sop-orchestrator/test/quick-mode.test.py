@@ -137,19 +137,21 @@ def main():
 
     blocked_labels = ["deadline", "deadlines", "sla", "slas", "kpi", "kpis"]
     lines = serialized.splitlines()
-    found_blocked_filled = False
-    for line in lines:
-        lowered = line.lower()
-        if any(label in lowered for label in blocked_labels):
-            if "[do_user_specify]" not in lowered:
-                found_blocked_filled = True
-                check(
-                    "blocked critical parameter remains unfilled in quick-mode fixture",
-                    False,
-                    f"Blocked critical parameter appears concretely filled: {line.strip()}",
-                )
-    if not found_blocked_filled:
-        check("all blocked critical parameters use [DO_USER_SPECIFY]", True)
+    lines_with_blocked_labels = [
+        line for line in lines
+        if any(label in line.lower() for label in blocked_labels)
+    ]
+    check(
+        "fixture contains at least one blocked label",
+        len(lines_with_blocked_labels) > 0,
+        "Expected fixture to test blocking of deadlines/SLAs/KPIs",
+    )
+    for line in lines_with_blocked_labels:
+        check(
+            f"blocked critical parameter uses [DO_USER_SPECIFY]: {line.strip()}",
+            "[do_user_specify]" in line.lower(),
+            f"Blocked parameter appears concretely filled: {line.strip()}",
+        )
 
     # 4. Schema validation — Quick mode output passes schema
     print("\n[4] Schema validation \u2014 Quick mode output passes schema")

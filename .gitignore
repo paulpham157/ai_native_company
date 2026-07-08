@@ -31,3 +31,9 @@ __pycache__/
 
 # Logs
 *.log
+
+# Scratch / temp
+scratchpad.md
+
+# Generated
+graphify-out/
