@@ -1,6 +1,6 @@
 # IPO+ICOM Framework Reference
 
-> Mọi SOP đều theo cấu trúc IPO (Input-Process-Output) với ICOM extension (Controls, Mechanisms, Outputs). Framework này định nghĩa từng thành phần và cách điền.
+> Mọi SOP đều theo cấu trúc IPO (Input-Process-Output) với ICOM extension (Input, Controls, Outputs, Mechanisms). Framework này định nghĩa từng thành phần và cách điền.
 
 ## IPO Core
 
