@@ -1,0 +1,98 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "xthinking-handoff-brief.schema.json",
+  "title": "XThinking Handoff Brief",
+  "description": "Handoff contract từ vibe-sop-orchestrator (Deep mode) sang vibe-xthinking-orchestrator. Truyền context, analysis request, và SOP requirements để xthinking phân tích domain sâu.",
+  "type": "object",
+  "required": [
+    "request_id",
+    "department",
+    "analysis_type",
+    "context",
+    "sop_requirements",
+    "deep_analysis_trigger",
+    "evidence",
+    "confidence_score",
+    "need_review"
+  ],
+  "properties": {
+    "request_id": {
+      "type": "string",
+      "description": "Unique identifier cho handoff request — dùng để trace sau này"
+    },
+    "department": {
+      "type": "string",
+      "description": "Department slug (vd: 02-marketing)"
+    },
+    "analysis_type": {
+      "type": "string",
+      "enum": ["topic", "problem", "decision"],
+      "description": "Loại analysis mà xthinking-orchestrator cần thực hiện"
+    },
+    "context": {
+      "type": "object",
+      "description": "Context thu thập từ gathering phase — charter + OKRs + KB",
+      "required": ["charter_summary", "okr_summary"],
+      "properties": {
+        "charter_summary": {
+          "type": "string",
+          "description": "Tóm tắt department charter — inputs, process, outputs, controls, mechanisms"
+        },
+        "okr_summary": {
+          "type": "string",
+          "description": "Tóm tắt OKRs liên quan đến SOP này"
+        },
+        "industry_context": {
+          "type": "string",
+          "description": "Industry context nếu có"
+        },
+        "kb_references": {
+          "type": "array",
+          "items": {"type": "string"},
+          "description": "Danh sách KB files đã tham khảo"
+        }
+      }
+    },
+    "sop_requirements": {
+      "type": "object",
+      "description": "Yêu cầu cho SOP cần tạo",
+      "required": ["title", "type"],
+      "properties": {
+        "title": {"type": "string", "description": "Tên SOP"},
+        "type": {"type": "string", "enum": ["operational", "documentation-only"]},
+        "scope": {"type": "string", "description": "Phạm vi của SOP"},
+        "key_questions": {
+          "type": "array",
+          "items": {"type": "string"},
+          "description": "Các câu hỏi cụ thể cần xthinking phân tích"
+        }
+      }
+    },
+    "deep_analysis_trigger": {
+      "type": "object",
+      "description": "Copy của deep-analysis-trigger artifact để trace decision",
+      "required": ["needs_deep_analysis", "reasoning", "complexity_score"],
+      "properties": {
+        "needs_deep_analysis": {"type": "boolean"},
+        "reasoning": {"type": "string"},
+        "complexity_score": {"type": "number", "minimum": 0, "maximum": 1},
+        "cross_department_count": {"type": "integer", "minimum": 1},
+        "risk_level": {"type": "string", "enum": ["low", "medium", "high"]}
+      }
+    },
+    "evidence": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["claim", "verbatim_quote", "source"],
+        "properties": {
+          "claim": {"type": "string"},
+          "verbatim_quote": {"type": "string", "minLength": 1},
+          "source": {"type": "string"}
+        }
+      }
+    },
+    "confidence_score": {"type": "number", "minimum": 0, "maximum": 1},
+    "need_review": {"type": "boolean"}
+  }
+}

@@ -1,0 +1,8 @@
+{
+  "request_id": 12345,
+  "department": true,
+  "analysis_type": "invalid-type",
+  "context": "missing required sub-fields",
+  "sop_requirements": "wrong type",
+  "deep_analysis_trigger": "missing required sub-fields"
+}

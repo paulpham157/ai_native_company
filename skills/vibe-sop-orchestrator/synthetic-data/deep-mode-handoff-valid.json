@@ -1,0 +1,42 @@
+{
+  "request_id": "SOP-MKT-002-20260708",
+  "department": "Marketing",
+  "analysis_type": "topic",
+  "context": {
+    "charter_summary": "Marketing department chịu trách nhiệm brand awareness, lead generation, và content strategy. Quy trình hiện tại có 3 departments liên quan: Content, Design, và Analytics.",
+    "okr_summary": "KR1: Tăng lead quality score từ 60% lên 85%. KR2: Giảm content review cycle từ 5 days xuống 2 days.",
+    "industry_context": "B2B SaaS marketing — cần compliance với GDPR và CCPA",
+    "kb_references": ["kb/industry-sop-templates/tech-startup.md", "kb/sop-quality-rubric.md"]
+  },
+  "sop_requirements": {
+    "title": "Cross-Department Content Approval Workflow",
+    "type": "operational",
+    "scope": "Content review và approval process giữa Content, Design, và Analytics teams",
+    "key_questions": [
+      "Best practices cho cross-department content approval trong B2B SaaS?",
+      "Làm sao để giảm review cycle mà vẫn đảm bảo quality?",
+      "GDPR/CCPA compliance requirements cho content approval workflow?"
+    ]
+  },
+  "deep_analysis_trigger": {
+    "needs_deep_analysis": true,
+    "reasoning": "SOP involves 3 departments with high compliance requirements",
+    "complexity_score": 0.85,
+    "cross_department_count": 3,
+    "risk_level": "high"
+  },
+  "evidence": [
+    {
+      "claim": "Cross-department workflow detected",
+      "verbatim_quote": "Chúng tôi có 3 teams phải phối hợp cho mỗi content piece",
+      "source": "user conversation"
+    },
+    {
+      "claim": "High compliance requirements",
+      "verbatim_quote": "Cần đảm bảo GDPR compliance cho mọi content",
+      "source": "MKT charter v2.1"
+    }
+  ],
+  "confidence_score": 0.8,
+  "need_review": false
+}

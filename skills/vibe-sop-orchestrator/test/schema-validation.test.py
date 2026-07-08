@@ -55,13 +55,20 @@ def main():
     SKILL_DIR = get_skill_dir()
     schemas = load_schemas()
 
-    # 1. All schemas parse as valid JSON
+    # 1. All schemas parse as valid JSON (uses load_schemas cache, but we
+    #    verify each file individually so a single malformed schema is
+    #    reported as a test failure instead of silently crashing elsewhere)
     print("\n[1] Schemas parse as valid JSON")
     schema_files = sorted((SKILL_DIR / "schema").glob("*.schema.json"))
     check("found \u22651 schema file", len(schema_files) >= 1, f"found {len(schema_files)}")
     for sf in schema_files:
-        print(f"    \u2713 {sf.name}")
-        passed += 1
+        try:
+            json.loads(sf.read_text())
+            print(f"    \u2713 {sf.name}")
+            passed += 1
+        except json.JSONDecodeError as e:
+            print(f"    \u2717 {sf.name} \u2014 {e}")
+            failed += 1
 
     # 2. deep-analysis-trigger validates a valid document
     print("\n[2] deep-analysis-trigger.schema.json validates valid document")
@@ -138,10 +145,23 @@ def main():
     else:
         check("sop-metadata.schema.json exists", False, "schema file not found")
 
-    # 8. Schema contract: schemas declared in skill.json's emits_evidence_confidence
+    # 8. xthinking-handoff-brief validates a valid handoff document
+    print("\n[8] xthinking-handoff-brief.schema.json validates valid handoff document")
+    handoff_schema = schemas.get("xthinking-handoff-brief.schema.json")
+    if handoff_schema:
+        if fixture_exists("deep-mode-handoff-valid"):
+            valid_doc = load_fixture("deep-mode-handoff-valid")
+            errs = validate(handoff_schema, valid_doc)
+            check("valid handoff passes", not errs, "; ".join(e.message for e in errs[:3]))
+        else:
+            check("deep-mode-handoff-valid.json fixture exists", False)
+    else:
+        check("xthinking-handoff-brief.schema.json exists", False, "schema file not found")
+
+    # 9. Schema contract: schemas declared in skill.json's emits_evidence_confidence
     #    must expose evidence/confidence_score/need_review.
     #    Derived dynamically so the test stays in sync with skill.json.
-    print("\n[8] Schema contract \u2014 schemas declared in skill.json emit evidence/confidence_score/need_review")
+    print("\n[9] Schema contract \u2014 schemas declared in skill.json emit evidence/confidence_score/need_review")
     skill_meta = json.loads((SKILL_DIR / "skill.json").read_text())
     contract_artifacts = skill_meta.get("integrations", {}).get("schema_contract", {}).get("emits_evidence_confidence", [])
     check("skill.json lists >=1 artifact in emits_evidence_confidence", len(contract_artifacts) >= 1)
