@@ -322,6 +322,8 @@ Emit SOP artifact với đầy đủ evidence/confidence_score/need_review (same
 
 > **Critical parameters guard cũng áp dụng cho Deep mode** — AI không tự điền deadlines, SLAs, KPI targets.
 
+> **Critical parameters guard cũng áp dụng cho Deep mode** — AI không tự điền deadlines, SLAs, KPI targets.
+
 ---
 
 ## Mode Selection Rubric

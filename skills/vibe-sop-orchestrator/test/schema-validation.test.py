@@ -158,7 +158,7 @@ def main():
     else:
         check("xthinking-handoff-brief.schema.json exists", False, "schema file not found")
 
-    # 10. Schema contract: schemas declared in skill.json's emits_evidence_confidence
+    # 9. Schema contract: schemas declared in skill.json's emits_evidence_confidence
     #    must expose evidence/confidence_score/need_review.
     #    Derived dynamically so the test stays in sync with skill.json.
     print("\n[9] Schema contract \u2014 schemas declared in skill.json emit evidence/confidence_score/need_review")
