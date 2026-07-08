@@ -1,0 +1,9 @@
+{
+  "sop_code": "SOP-MKT-001",
+  "department": "Marketing",
+  "type": "operational",
+  "version": "1.0",
+  "evidence": [],
+  "confidence_score": 0.8,
+  "need_review": false
+}

@@ -1,0 +1,12 @@
+{
+  "needs_deep_analysis": true,
+  "reasoning": "SOP involves 3 departments with high compliance requirements",
+  "complexity_score": 0.85,
+  "cross_department_count": 3,
+  "risk_level": "high",
+  "evidence": [
+    {"claim": "Cross-department workflow detected", "source": "department charter"}
+  ],
+  "confidence_score": 0.8,
+  "need_review": false
+}

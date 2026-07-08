@@ -74,7 +74,7 @@ Dùng cho SOPs complex, high impact, nhiều dependencies:
 
 ## Schema Contract
 
-- `emits_evidence_confidence`: sop-content, sop-metadata
+- `emits_evidence_confidence`: sop-content, sop-metadata, deep-analysis-trigger
 - `handoff_brief_schema`: schema/aiworkforce-handoff-brief.schema.json
 - `confidence_threshold`: 0.7
 
