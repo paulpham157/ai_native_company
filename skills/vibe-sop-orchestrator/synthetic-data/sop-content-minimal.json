@@ -1,0 +1,10 @@
+{
+  "sop_code": "SOP-MKT-001",
+  "title": "Minimal SOP",
+  "inputs": [{"name": "x", "source": "y"}],
+  "process": [{"step": 1, "action": "do x"}],
+  "outputs": [{"name": "y", "destination": "z"}],
+  "evidence": [],
+  "confidence_score": 0.8,
+  "need_review": false
+}

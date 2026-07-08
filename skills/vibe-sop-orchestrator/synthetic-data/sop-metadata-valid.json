@@ -1,0 +1,20 @@
+{
+  "sop_code": "SOP-MKT-001",
+  "department": "Marketing",
+  "type": "operational",
+  "version": "1.0",
+  "title": "Content Approval Workflow",
+  "owner": "Content Lead",
+  "tags": ["content", "approval", "marketing"],
+  "dependencies": [
+    {"sop_code": "SOP-MKT-000", "relation": "precedes"}
+  ],
+  "change_history": [
+    {"version": "1.0", "date": "2026-01-15", "author": "Content Lead", "summary": "Initial version"}
+  ],
+  "evidence": [
+    {"claim": "Charter defines workflow", "source": "MKT charter v2.1"}
+  ],
+  "confidence_score": 0.9,
+  "need_review": false
+}

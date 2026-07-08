@@ -4,10 +4,15 @@ schema-validation.test.py — vibe-sop-orchestrator
 
 Validates:
 1. All schema/*.schema.json are valid draft-07 schemas.
-2. Schemas declared in skill.json's emits_evidence_confidence accept valid instances.
-3. Schemas reject invalid instances (missing required fields).
+2. Fixture instances in synthetic-data/ validate against their schema.
+3. Invalid fixture instances are correctly rejected.
 4. Contract schemas emit evidence/confidence_score/need_review per schema contract.
    Schema list derived dynamically from skill.json — stays in sync automatically.
+
+Fixtures live in synthetic-data/ as JSON files named {artifact}-{variant}.json:
+  - {artifact}-valid.json     — full valid instance
+  - {artifact}-invalid.json   — malformed instance (missing/wrong fields)
+  - {artifact}-minimal.json   — minimal instance for contract test
 
 Run:
     python3 test/schema-validation.test.py
@@ -28,6 +33,8 @@ except ImportError:
 
 from validator import validate_instance
 
+SYNTHETIC_DIR = SKILL_DIR / "synthetic-data"
+
 passed = 0
 failed = 0
 
@@ -46,6 +53,17 @@ def validate(schema, instance):
     if HAVE_JSONSCHEMA:
         return list(jsonschema.Draft7Validator(schema).iter_errors(instance))
     return validate_instance(instance, schema)
+
+
+def load_fixture(name):
+    path = SYNTHETIC_DIR / f"{name}.json"
+    if not path.is_file():
+        raise FileNotFoundError(f"Fixture not found: {path}")
+    return json.loads(path.read_text())
+
+
+def fixture_exists(name):
+    return (SYNTHETIC_DIR / f"{name}.json").is_file()
 
 
 def main():
@@ -72,20 +90,12 @@ def main():
     print("\n[2] deep-analysis-trigger.schema.json validates valid document")
     trigger_schema = schemas.get("deep-analysis-trigger.schema.json")
     if trigger_schema:
-        valid_doc = {
-            "needs_deep_analysis": True,
-            "reasoning": "SOP involves 3 departments with high compliance requirements",
-            "complexity_score": 0.85,
-            "cross_department_count": 3,
-            "risk_level": "high",
-            "evidence": [
-                {"claim": "Cross-department workflow detected", "source": "department charter"}
-            ],
-            "confidence_score": 0.8,
-            "need_review": False
-        }
-        errs = validate(trigger_schema, valid_doc)
-        check("valid trigger passes", not errs, "; ".join(e.message for e in errs[:3]))
+        if fixture_exists("deep-analysis-trigger-valid"):
+            valid_doc = load_fixture("deep-analysis-trigger-valid")
+            errs = validate(trigger_schema, valid_doc)
+            check("valid trigger passes", not errs, "; ".join(e.message for e in errs[:3]))
+        else:
+            check("deep-analysis-trigger-valid.json fixture exists", False)
     else:
         check("deep-analysis-trigger.schema.json exists", False, "schema file not found")
 
@@ -93,44 +103,24 @@ def main():
     print("\n[3] sop-content.schema.json validates valid SOP document")
     content_schema = schemas.get("sop-content.schema.json")
     if content_schema:
-        valid_sop = {
-            "sop_code": "SOP-MKT-001",
-            "title": "Content Approval Workflow",
-            "version": "1.0",
-            "inputs": [
-                {"name": "Draft content", "source": "Content Team", "format": "markdown"}
-            ],
-            "process": [
-                {"step": 1, "action": "Review draft", "responsible": "Editor", "duration_estimate": "2h"}
-            ],
-            "outputs": [
-                {"name": "Approved content", "destination": "Publishing", "format": "markdown"}
-            ],
-            "controls": [
-                {"name": "Style Guide v3", "standard": "QC-001"}
-            ],
-            "mechanisms": [
-                {"name": "CMS", "type": "tool"}
-            ],
-            "evidence": [
-                {"claim": "Workflow documented in charter", "source": "MKT charter v2.1"}
-            ],
-            "confidence_score": 0.85,
-            "need_review": False
-        }
-        errs = validate(content_schema, valid_sop)
-        check("valid SOP content passes", not errs, "; ".join(e.message for e in errs[:3]))
+        if fixture_exists("sop-content-valid"):
+            valid_sop = load_fixture("sop-content-valid")
+            errs = validate(content_schema, valid_sop)
+            check("valid SOP content passes", not errs, "; ".join(e.message for e in errs[:3]))
+        else:
+            check("sop-content-valid.json fixture exists", False)
     else:
         check("sop-content.schema.json exists", False, "schema file not found")
 
     # 4. sop-content rejects invalid document (missing required fields)
     print("\n[4] sop-content.schema.json rejects invalid document")
     if content_schema:
-        invalid_sop = {
-            "title": "Missing sop_code and inputs"
-        }
-        errs = validate(content_schema, invalid_sop)
-        check("invalid SOP rejected", len(errs) > 0, f"expected errors, got 0")
+        if fixture_exists("sop-content-invalid"):
+            invalid_sop = load_fixture("sop-content-invalid")
+            errs = validate(content_schema, invalid_sop)
+            check("invalid SOP rejected", len(errs) > 0, f"expected errors, got 0")
+        else:
+            check("sop-content-invalid.json fixture exists", False)
     else:
         check("sop-content.schema.json exists", False, "schema file not found")
 
@@ -138,40 +128,24 @@ def main():
     print("\n[5] sop-metadata.schema.json validates valid metadata")
     meta_schema = schemas.get("sop-metadata.schema.json")
     if meta_schema:
-        valid_meta = {
-            "sop_code": "SOP-MKT-001",
-            "department": "Marketing",
-            "type": "operational",
-            "version": "1.0",
-            "title": "Content Approval Workflow",
-            "owner": "Content Lead",
-            "tags": ["content", "approval", "marketing"],
-            "dependencies": [
-                {"sop_code": "SOP-MKT-000", "relation": "precedes"}
-            ],
-            "change_history": [
-                {"version": "1.0", "date": "2026-01-15", "author": "Content Lead", "summary": "Initial version"}
-            ],
-            "evidence": [
-                {"claim": "Charter defines workflow", "source": "MKT charter v2.1"}
-            ],
-            "confidence_score": 0.9,
-            "need_review": False
-        }
-        errs = validate(meta_schema, valid_meta)
-        check("valid SOP metadata passes", not errs, "; ".join(e.message for e in errs[:3]))
+        if fixture_exists("sop-metadata-valid"):
+            valid_meta = load_fixture("sop-metadata-valid")
+            errs = validate(meta_schema, valid_meta)
+            check("valid SOP metadata passes", not errs, "; ".join(e.message for e in errs[:3]))
+        else:
+            check("sop-metadata-valid.json fixture exists", False)
     else:
         check("sop-metadata.schema.json exists", False, "schema file not found")
 
     # 6. sop-metadata rejects invalid metadata
     print("\n[6] sop-metadata.schema.json rejects invalid metadata")
     if meta_schema:
-        invalid_meta = {
-            "sop_code": "invalid-code",
-            "department": "Marketing"
-        }
-        errs = validate(meta_schema, invalid_meta)
-        check("invalid metadata rejected", len(errs) > 0, f"expected errors, got 0")
+        if fixture_exists("sop-metadata-invalid"):
+            invalid_meta = load_fixture("sop-metadata-invalid")
+            errs = validate(meta_schema, invalid_meta)
+            check("invalid metadata rejected", len(errs) > 0, f"expected errors, got 0")
+        else:
+            check("sop-metadata-invalid.json fixture exists", False)
     else:
         check("sop-metadata.schema.json exists", False, "schema file not found")
 
@@ -182,45 +156,17 @@ def main():
     skill_meta = json.loads((SKILL_DIR / "skill.json").read_text())
     contract_artifacts = skill_meta.get("integrations", {}).get("schema_contract", {}).get("emits_evidence_confidence", [])
     check("skill.json lists ≥1 artifact in emits_evidence_confidence", len(contract_artifacts) >= 1)
-    valid_instances = {
-        "deep-analysis-trigger": {
-            "needs_deep_analysis": False,
-            "reasoning": "Simple routine task",
-            "complexity_score": 0.2,
-            "evidence": [],
-            "confidence_score": 0.8,
-            "need_review": False,
-        },
-        "sop-content": {
-            "sop_code": "SOP-MKT-001",
-            "title": "Minimal SOP",
-            "inputs": [{"name": "x", "source": "y"}],
-            "process": [{"step": 1, "action": "do x"}],
-            "outputs": [{"name": "y", "destination": "z"}],
-            "evidence": [],
-            "confidence_score": 0.8,
-            "need_review": False,
-        },
-        "sop-metadata": {
-            "sop_code": "SOP-MKT-001",
-            "department": "Marketing",
-            "type": "operational",
-            "version": "1.0",
-            "evidence": [],
-            "confidence_score": 0.8,
-            "need_review": False,
-        },
-    }
     for artifact in contract_artifacts:
         schema_file = f"{artifact}.schema.json"
         s = schemas.get(schema_file)
         if not s:
             check(f"{artifact}.schema.json found in schema/", False, "schema file missing — update test or add schema")
             continue
-        doc = valid_instances.get(artifact)
-        if not doc:
-            check(f"{artifact} has a valid instance in contract test", False, "add minimal valid instance to test")
+        fixture_name = f"{artifact}-minimal"
+        if not fixture_exists(fixture_name):
+            check(f"{artifact} has minimal instance fixture", False, f"missing synthetic-data/{fixture_name}.json")
             continue
+        doc = load_fixture(fixture_name)
         errs = validate(s, doc)
         check(
             f"{artifact} schema accepts minimal instance with evidence/confidence_score/need_review",

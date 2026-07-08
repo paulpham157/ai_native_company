@@ -1,0 +1,25 @@
+{
+  "sop_code": "SOP-MKT-001",
+  "title": "Content Approval Workflow",
+  "version": "1.0",
+  "inputs": [
+    {"name": "Draft content", "source": "Content Team", "format": "markdown"}
+  ],
+  "process": [
+    {"step": 1, "action": "Review draft", "responsible": "Editor", "duration_estimate": "2h"}
+  ],
+  "outputs": [
+    {"name": "Approved content", "destination": "Publishing", "format": "markdown"}
+  ],
+  "controls": [
+    {"name": "Style Guide v3", "standard": "QC-001"}
+  ],
+  "mechanisms": [
+    {"name": "CMS", "type": "tool"}
+  ],
+  "evidence": [
+    {"claim": "Workflow documented in charter", "source": "MKT charter v2.1"}
+  ],
+  "confidence_score": 0.85,
+  "need_review": false
+}
