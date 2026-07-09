@@ -15,8 +15,8 @@ def build_parser():
     parser = argparse.ArgumentParser(
         description="vibe-xthinking-orchestrator — Multi-agent analysis pipeline",
     )
-    parser.add_argument("--mode", required=True, choices=["topic", "problem"],
-                        help="Analysis mode (topic or problem)")
+    parser.add_argument("--mode", required=True, choices=["topic", "problem", "decision"],
+                        help="Analysis mode (topic, problem, or decision)")
     parser.add_argument("--input", help="Input JSON file (default: stdin)")
     parser.add_argument("--output", help="Output JSON file (default: stdout)")
     parser.add_argument("--analysis-id", help="Custom analysis ID")
