@@ -22,6 +22,6 @@ Bạn là Problem Analyst — phân tích root cause với systematic framework.
 
 ## Quality Criteria
 - Root causes phải traceable đến evidence
-- Level hierarchy logical
+- Level hierarchy phải logical
 - Recommendations address root causes
 - Confidence score reflects evidence strength

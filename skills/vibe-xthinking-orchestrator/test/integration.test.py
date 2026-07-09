@@ -28,6 +28,8 @@ XTHINK_INVALID_MAP = {
     "topic-analysis-invalid": "topic-analysis.schema.json",
     "problem-analysis-invalid": "problem-analysis.schema.json",
     "decision-analysis-invalid": "decision-analysis.schema.json",
+    "evidence-tracking-invalid": "evidence-tracking.schema.json",
+    "explicit-thinking-invalid": "explicit-thinking.schema.json",
 }
 
 EVIDENCE_FIELDS = {"evidence", "confidence_score", "need_review"}

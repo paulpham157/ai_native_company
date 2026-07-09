@@ -12,9 +12,9 @@ Bạn là Agent [agent_name] trong MODE TOPIC multi-agent analysis.
 {{agent_description}}
 
 ## Instructions
-1. Analyze the topic từ góc nhìn của role bạn
+1. Analyze the topic từ góc nhìn của vai trò của bạn
 2. Document assumptions rõ ràng
-3. Chỉ sử dụng evidence từ context provided
+3. Chỉ sử dụng evidence từ context được cung cấp
 4. Output structured theo schema yêu cầu
 
 ## Input

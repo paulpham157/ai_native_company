@@ -111,6 +111,11 @@ def main():
             check("valid passes", not errs, "; ".join(e.message for e in errs[:3]))
         else:
             check("evidence-tracking-valid.json fixture exists", False)
+        if fixture_exists("evidence-tracking-invalid"):
+            errs = validate(evidence_schema, load_fixture("evidence-tracking-invalid"))
+            check("invalid rejected", len(errs) > 0, f"expected errors, got 0")
+        else:
+            check("evidence-tracking-invalid.json fixture exists", False)
     else:
         check("evidence-tracking.schema.json exists", False, "schema file not found")
 
@@ -123,6 +128,11 @@ def main():
             check("valid passes", not errs, "; ".join(e.message for e in errs[:3]))
         else:
             check("explicit-thinking-valid.json fixture exists", False)
+        if fixture_exists("explicit-thinking-invalid"):
+            errs = validate(thinking_schema, load_fixture("explicit-thinking-invalid"))
+            check("invalid rejected", len(errs) > 0, f"expected errors, got 0")
+        else:
+            check("explicit-thinking-invalid.json fixture exists", False)
     else:
         check("explicit-thinking.schema.json exists", False, "schema file not found")
 
