@@ -30,6 +30,13 @@ class XThinkingOrchestrator:
                 "agents": [("validation", "Validator")],
             },
         ],
+        "problem": [
+            {
+                "major_phase": "analysis",
+                "checkpoint_after": False,
+                "agents": [("analysis", "Problem Analyst")],
+            },
+        ],
     }
 
     def __init__(self, mode, agent_runner, evidence_tracker=None, checkpoint=None, context_provider=None, evidence_validator=None):
@@ -55,6 +62,9 @@ class XThinkingOrchestrator:
         return context
 
     def execute(self, handoff_brief, analysis_id=None):
+        if self.mode == "problem":
+            return self._execute_problem(handoff_brief, analysis_id)
+
         topic = handoff_brief.get("context", {}).get("industry_context", "Unknown topic")
         if not analysis_id:
             analysis_id = f"ta-{uuid.uuid4().hex[:8]}"
@@ -178,3 +188,63 @@ class XThinkingOrchestrator:
                 })
 
         return phases, new_chain, new_evidence
+
+    def _execute_problem(self, handoff_brief, analysis_id):
+        problem = handoff_brief.get("context", {}).get("industry_context", "Unknown problem")
+        if not analysis_id:
+            analysis_id = f"pa-{uuid.uuid4().hex[:8]}"
+
+        context = {
+            "handoff": handoff_brief,
+            "problem": problem,
+            "analysis_id": analysis_id,
+        }
+        if self.context_provider:
+            enriched = self.context_provider.enrich(handoff_brief, "analysis", "Problem Analyst")
+            context.update(enriched)
+
+        output = self.agent_runner.run("Problem Analyst", "analysis", context)
+
+        evidence_chain = []
+        all_evidence = []
+        for e in output.get("evidence", []):
+            evidence_chain.append({
+                "agent": "Problem Analyst",
+                "claim": e.get("claim", ""),
+                "confidence": e.get("confidence", 0.0),
+                "source": e.get("source", ""),
+            })
+            all_evidence.append({
+                "claim": e.get("claim", ""),
+                "confidence": e.get("confidence", 0.0),
+                "source": e.get("source", ""),
+            })
+
+        insights = [{
+            "claim": e.get("claim", ""),
+            "evidence_source": e.get("source", ""),
+            "agent": "Problem Analyst",
+        } for e in evidence_chain]
+
+        tracking_result = self.evidence_tracker.track(
+            evidence_chain=evidence_chain,
+            analysis_ref=analysis_id,
+        )
+
+        validation_result = None
+        if self.evidence_validator:
+            validation_result = self.evidence_validator.assess(evidence_chain)
+
+        return {
+            "analysis_id": analysis_id,
+            "problem": problem,
+            "mode": self.mode,
+            "framework": output.get("framework", "5-whys"),
+            "root_causes": output.get("root_causes", []),
+            "recommendations": output.get("recommendations", []),
+            "evidence": all_evidence,
+            "insights": insights,
+            "confidence_score": tracking_result["confidence_score"],
+            "need_review": tracking_result["need_review"],
+            "validation": validation_result,
+        }

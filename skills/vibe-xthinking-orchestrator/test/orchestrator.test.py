@@ -212,6 +212,101 @@ def main():
     except Exception as e:
         check("handles empty input gracefully", False, str(e))
 
+    # ── Test 10: Problem mode execution (tracer bullet) ──
+    print("\n[10] Problem mode execution")
+    handoff_problem = {
+        "request_id": "req-problem-001",
+        "analysis_type": "problem",
+        "context": {
+            "industry_context": "High customer churn rate in B2B SaaS",
+        },
+        "evidence": [],
+        "confidence_score": 0.8,
+        "need_review": False,
+    }
+
+    fake_problem_outputs = {
+        "analysis:Problem Analyst": {
+            "framework": "5-whys",
+            "root_causes": [{"cause": "Poor onboarding", "level": 1, "category": "process"}],
+            "recommendations": ["Improve onboarding with milestones"],
+            "evidence": [
+                {"claim": "60% of churned customers cite poor onboarding", "confidence": 0.85, "source": "Exit survey 2025"},
+            ],
+        },
+    }
+    fake_problem = FakeAgentRunner(fake_problem_outputs)
+    orch_p = XThinkingOrchestrator(mode="problem", agent_runner=fake_problem, evidence_tracker=EvidenceTracker())
+    result_p = orch_p.execute(handoff_problem)
+
+    check("result is dict", isinstance(result_p, dict))
+    check("has analysis_id", "analysis_id" in result_p)
+    check("problem matches handoff context", result_p.get("problem") == "High customer churn rate in B2B SaaS")
+    check("mode is problem", result_p.get("mode") == "problem")
+    check("has framework", result_p.get("framework") == "5-whys")
+    check("has root_causes", len(result_p.get("root_causes", [])) == 1)
+    check("root_cause has cause/level", result_p["root_causes"][0]["cause"] == "Poor onboarding" and result_p["root_causes"][0]["level"] == 1)
+    check("has recommendations", len(result_p.get("recommendations", [])) == 1)
+    check("has evidence list", "evidence" in result_p and len(result_p["evidence"]) > 0)
+    check("has confidence_score", "confidence_score" in result_p)
+    check("confidence_score in [0,1]", 0 <= result_p["confidence_score"] <= 1)
+    check("has need_review", "need_review" in result_p)
+    check("need_review is bool", isinstance(result_p["need_review"], bool))
+    check("has insights", "insights" in result_p and len(result_p["insights"]) > 0)
+    for ins in result_p["insights"]:
+        check("insight has claim/evidence_source/agent",
+              "claim" in ins and "evidence_source" in ins and "agent" in ins)
+
+    # ── Test 11: Problem mode schema compliance ──
+    print("\n[11] Problem mode schema compliance")
+    problem_schema = schemas.get("problem-analysis.schema.json")
+    if problem_schema:
+        errs = validate(problem_schema, result_p)
+        check("output validates against problem-analysis.schema.json", not errs,
+              "; ".join(e.message for e in errs[:3]))
+    else:
+        check("problem-analysis.schema.json exists", False)
+
+    # ── Test 12: Problem mode custom analysis_id ──
+    print("\n[12] Problem mode custom analysis_id")
+    handoff_p2 = {
+        "request_id": "req-problem-002",
+        "analysis_type": "problem",
+        "context": {"industry_context": "Test problem"},
+        "evidence": [],
+        "confidence_score": 0.8,
+        "need_review": False,
+    }
+    fake_p2 = FakeAgentRunner(fake_problem_outputs)
+    orch_p2 = XThinkingOrchestrator(mode="problem", agent_runner=fake_p2, evidence_tracker=EvidenceTracker())
+    result_p2 = orch_p2.execute(handoff_p2, analysis_id="problem-custom-001")
+    check("custom analysis_id used", result_p2.get("analysis_id") == "problem-custom-001")
+
+    # ── Test 13: Problem mode empty/minimal input ──
+    print("\n[13] Problem mode empty/minimal input")
+    fake_empty = FakeAgentRunner({})
+    orch_empty = XThinkingOrchestrator(mode="problem", agent_runner=fake_empty, evidence_tracker=EvidenceTracker())
+    try:
+        result_empty = orch_empty.execute({"request_id": "empty-problem"})
+        check("executes with minimal problem input", True)
+        check("problem falls back to Unknown", result_empty.get("problem") == "Unknown problem")
+        check("framework defaults to 5-whys", result_empty.get("framework") == "5-whys")
+        check("empty root_causes", len(result_empty.get("root_causes", [])) == 0)
+        check("confidence_score defaults to 0", result_empty.get("confidence_score") == 0.0)
+        check("insights is empty list", result_empty.get("insights") == [])
+    except Exception as e:
+        check("handles empty problem input gracefully", False, str(e))
+
+    # ── Test 14: Invalid mode still rejected ──
+    print("\n[14] Invalid mode rejected")
+    try:
+        XThinkingOrchestrator(mode="invalid-mode", agent_runner=FakeAgentRunner({}), evidence_tracker=EvidenceTracker())
+        check("invalid mode raises ValueError", False, "expected ValueError")
+    except ValueError as e:
+        check("invalid mode raises ValueError", True)
+        check("error message mentions mode", "mode" in str(e).lower(),
+              f"message: {e}")
+
     print("\n" + "=" * 60)
     print(f"Result: {passed} passed, {failed} failed")
     print("=" * 60)
