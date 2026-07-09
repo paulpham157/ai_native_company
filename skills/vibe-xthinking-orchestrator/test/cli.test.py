@@ -44,6 +44,12 @@ FAKE_OUTPUTS = {
     "thinking:Value Chain Analyst": {"analysis": "done", "evidence": []},
     "synthesis:Synthesizer": {"key_insight": "done", "evidence": []},
     "validation:Validator": {"result": "validated", "evidence": []},
+    "analysis:Problem Analyst": {
+        "framework": "5-whys",
+        "root_causes": [{"cause": "Poor onboarding", "level": 1, "category": "process"}],
+        "recommendations": ["Improve onboarding"],
+        "evidence": [{"claim": "60% cite poor onboarding", "confidence": 0.85, "source": "Exit survey"}],
+    },
 }
 
 FAKE_RUNNER = FakeAgentRunner(FAKE_OUTPUTS)
@@ -157,17 +163,21 @@ def main():
     )
     check("invalid mode returns non-zero", exit_code != 0)
 
-    # ── Test 8: Unsupported 'problem' mode ──
-    print("\n[8] Unsupported 'problem' mode")
+    # ── Test 8: Problem mode ──
+    print("\n[8] Problem mode")
     exit_code, output = run_from_args(
         mode="problem",
         input_data=input_json,
         capture_output=True,
         agent_runner=FAKE_RUNNER,
     )
-    check("problem mode returns non-zero", exit_code != 0)
-    check("problem mode reports unsupported",
-          isinstance(output, str) and "unknown mode" in output.lower())
+    check("problem mode returns zero", exit_code == 0, f"got {exit_code}")
+    result = json.loads(output)
+    check("output mode is problem", result.get("mode") == "problem")
+    check("output has framework", "framework" in result)
+    check("output has root_causes", len(result.get("root_causes", [])) > 0)
+    check("output has confidence_score", "confidence_score" in result)
+    check("output has need_review", "need_review" in result)
 
     # ── Test 9: Unsupported 'decision' mode ──
     print("\n[9] Unsupported 'decision' mode")
