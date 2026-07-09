@@ -123,7 +123,17 @@ def main():
     check("agent_runner assigned", orchestrator.agent_runner is fake)
     check("evidence_tracker assigned", orchestrator.evidence_tracker is tracker)
 
-    # ── Test 3: Full pipeline execution ──
+    # ── Test 3: Orchestrator rejects invalid mode ──
+    print("\n[3] Orchestrator rejects invalid mode")
+    try:
+        XThinkingOrchestrator(mode="invalid-mode", agent_runner=fake, evidence_tracker=tracker)
+        check("invalid mode raises ValueError", False, "expected ValueError")
+    except ValueError as e:
+        check("invalid mode raises ValueError", True)
+        check("error message mentions mode", "mode" in str(e).lower(),
+              f"message: {e}")
+
+    # ── Test 4: Full pipeline execution ──
     print("\n[3] Full pipeline execution")
     fake = FakeAgentRunner(fake_outputs)
     orchestrator = XThinkingOrchestrator(mode="topic", agent_runner=fake, evidence_tracker=EvidenceTracker())
@@ -134,8 +144,8 @@ def main():
     check("topic matches handoff context", result.get("topic") == "FinTech industry in Southeast Asia")
     check("mode is topic", result.get("mode") == "topic")
 
-    # ── Test 4: Phases are correct ──
-    print("\n[4] Phase structure")
+    # ── Test 5: Phases are correct ──
+    print("\n[5] Phase structure")
     phases = result.get("phases", [])
     check("5 phases in output", len(phases) == 5)
     expected_phases = [
@@ -160,8 +170,8 @@ def main():
     check("need_review is bool", isinstance(result["need_review"], bool))
     check("has insights", "insights" in result and len(result["insights"]) > 0)
     for ins in result["insights"]:
-        check("insight has claim/evidence/source", 
-              "claim" in ins and "evidence" in ins and "source" in ins)
+        check("insight has claim/evidence_source/agent", 
+              "claim" in ins and "evidence_source" in ins and "agent" in ins)
 
     # ── Test 6: Schema compliance ──
     print("\n[6] Schema compliance")

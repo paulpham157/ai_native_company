@@ -59,8 +59,16 @@ def main():
     except Exception as e:
         check(f"ContextProvider.enrich raises NotImplementedError", False, f"got {type(e).__name__}: {e}")
 
-    # ── Test 2: Industry template selection ──
-    print("\n[2] Industry template selection")
+    # ── Test 2: KBContextProvider default skill_dir auto-discovery ──
+    print("\n[2] KBContextProvider default skill_dir auto-discovery")
+    auto_provider = KBContextProvider()
+    auto_result = auto_provider.enrich(make_handoff("Tech startup in Singapore"), "research", "Researcher")
+    kb_docs = auto_result.get("kb_docs", {})
+    has_evidence_rubric = any("evidence-rubric" in str(k) for k in kb_docs.keys())
+    check("default constructor loads evidence-rubric.md", has_evidence_rubric)
+
+    # ── Test 3: Industry template selection ──
+    print("\n[3] Industry template selection")
     provider = KBContextProvider(skill_dir=SKILL_DIR)
 
     tech_handoff = make_handoff("Tech startup in Singapore")
@@ -73,7 +81,7 @@ def main():
     ecom_result = provider.enrich(ecom_handoff, "research", "Researcher")
     check("ecommerce template found", "industry_template" in ecom_result)
     check("ecommerce template has relevant content",
-          ecom_result["industry_template"] and "Market Overview" in ecom_result.get("industry_template", ""))
+          ecom_result["industry_template"] and "Market Overview" in ecom_result["industry_template"])
 
     consult_handoff = make_handoff("Management consulting for banks")
     consult_result = provider.enrich(consult_handoff, "research", "Researcher")
@@ -84,8 +92,8 @@ def main():
     check("unknown industry returns None template",
           unknown_result.get("industry_template") is None)
 
-    # ── Test 3: Phase-specific KB loading ──
-    print("\n[3] Phase-specific KB loading")
+    # ── Test 4: Phase-specific KB loading ──
+    print("\n[4] Phase-specific KB loading")
     research_ctx = provider.enrich(make_handoff(), "research", "Researcher")
     kb = research_ctx.get("kb_docs", {})
     check("research phase loads evidence-rubric.md", "evidence-rubric.md" in kb)
@@ -100,15 +108,15 @@ def main():
     kb3 = validation_ctx.get("kb_docs", {})
     check("validation phase loads evidence-tracking-rubric.md", "evidence-tracking-rubric.md" in kb3)
 
-    # ── Test 4: KB content is non-empty ──
-    print("\n[4] KB content quality")
+    # ── Test 5: KB content is non-empty ──
+    print("\n[5] KB content quality")
     for phase_name, ctx in [("research", research_ctx), ("thinking", thinking_ctx), ("validation", validation_ctx)]:
         for doc_name, content in ctx.get("kb_docs", {}).items():
             check(f"{phase_name}: {doc_name} has content", len(content) > 50,
                   f"only {len(content)} chars")
 
-    # ── Test 5: Provider enriches orchestrator agent context ──
-    print("\n[5] Orchestrator integration — context passed to agent")
+    # ── Test 6: Provider enriches orchestrator agent context ──
+    print("\n[6] Orchestrator integration — context passed to agent")
     captured_contexts = {}
 
     class CapturingRunner(FakeAgentRunner):
@@ -131,8 +139,8 @@ def main():
         check(f"{key} has industry_template in context", "industry_template" in ctx,
               f"missing industry_template in {key}")
 
-    # ── Test 6: Missing KB files — graceful degradation ──
-    print("\n[6] Graceful degradation with missing files")
+    # ── Test 7: Missing KB files — graceful degradation ──
+    print("\n[7] Graceful degradation with missing files")
     fake_dir = Path("/tmp/nonexistent-skill-dir")
     degraded = KBContextProvider(skill_dir=fake_dir)
     result = degraded.enrich(make_handoff(), "research", "Researcher")

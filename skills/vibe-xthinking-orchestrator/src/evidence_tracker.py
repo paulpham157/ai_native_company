@@ -42,7 +42,7 @@ class EvidenceTracker:
             "evidence_chain": evidence_chain,
             "aggregate_confidence": agg,
             "evidence": [
-                {"claim": e["claim"], "confidence": e["confidence"], "source": e["source"]}
+                {"claim": e.get("claim", ""), "confidence": e.get("confidence", 0.0), "source": e.get("source", "")}
                 for e in evidence_chain
             ],
             "confidence_score": agg,

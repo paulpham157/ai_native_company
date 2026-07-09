@@ -41,7 +41,6 @@ class XThinkingOrchestrator:
         self.checkpoint = checkpoint
         self.context_provider = context_provider
         self.evidence_validator = evidence_validator
-        self.context_provider = context_provider
 
     def _build_agent_context(self, handoff_brief, topic, phase_label, agent_name, phases):
         context = {
@@ -125,9 +124,9 @@ class XThinkingOrchestrator:
 
         for e in evidence_chain:
             insights.append({
-                "claim": e["claim"],
-                "evidence": e["source"],
-                "source": e["agent"],
+                "claim": e.get("claim", ""),
+                "evidence_source": e.get("source", ""),
+                "agent": e.get("agent", ""),
             })
 
         return {
@@ -143,18 +142,15 @@ class XThinkingOrchestrator:
         }
 
     def _revise_group(self, group, handoff_brief, topic, phases, evidence_chain, all_evidence, feedback):
+        revise_agents = {a for _, a in group["agents"]}
         for _ in range(len(group["agents"])):
             phases.pop()
-        trimmed_chain = []
-        trimmed_evidence = []
-        for e in evidence_chain:
-            if e["agent"] not in [a for _, a in group["agents"]]:
-                trimmed_chain.append(e)
-        for e in all_evidence:
-            if e["claim"] not in [ec["claim"] for ec in trimmed_chain]:
-                trimmed_evidence.append(e)
-            else:
-                pass  # rebuilt below
+
+        new_chain = [e for e in evidence_chain if e.get("agent") not in revise_agents]
+        new_evidence = [
+            {"claim": e.get("claim", ""), "confidence": e.get("confidence", 0.0), "source": e.get("source", "")}
+            for e in new_chain
+        ]
 
         for phase_label, agent_name in group["agents"]:
             prev_outputs = [p["output"] for p in phases]
@@ -169,16 +165,16 @@ class XThinkingOrchestrator:
             })
             agent_evidence = output.get("evidence", [])
             for e in agent_evidence:
-                trimmed_chain.append({
+                new_chain.append({
                     "agent": agent_name,
                     "claim": e.get("claim", ""),
                     "confidence": e.get("confidence", 0.0),
                     "source": e.get("source", ""),
                 })
-                trimmed_evidence.append({
+                new_evidence.append({
                     "claim": e.get("claim", ""),
                     "confidence": e.get("confidence", 0.0),
                     "source": e.get("source", ""),
                 })
 
-        return phases, trimmed_chain, trimmed_evidence
+        return phases, new_chain, new_evidence

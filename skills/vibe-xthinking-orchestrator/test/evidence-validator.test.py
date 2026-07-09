@@ -87,7 +87,14 @@ def main():
         {"agent": "Explicit Thinker", "claim": "Market growing 35%", "confidence": 0.7, "source": "Gartner"},
     ]
     result = validator.assess(duplicates)
-    check("duplicate claims detected", len(result.get("conflicts", [])) > 0 or len(result.get("issues", [])) > 0)
+    conflicts = result.get("conflicts", [])
+    check("at least one duplicate conflict reported", len(conflicts) > 0)
+    first = conflicts[0] if conflicts else {}
+    check("conflict has duplicated claim string", first.get("claim") == "Market growing 35%")
+    agents = first.get("agents", [])
+    check("conflict includes both agents", "Researcher" in agents and "Explicit Thinker" in agents)
+    confidences = first.get("confidences", [])
+    check("conflict has expected confidences", 0.9 in confidences and 0.7 in confidences)
 
     # ── Test 5: Assessment summary ──
     print("\n[5] Assessment summary")

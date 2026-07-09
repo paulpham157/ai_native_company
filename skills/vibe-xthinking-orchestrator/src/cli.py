@@ -15,8 +15,8 @@ def build_parser():
     parser = argparse.ArgumentParser(
         description="vibe-xthinking-orchestrator — Multi-agent analysis pipeline",
     )
-    parser.add_argument("--mode", required=True, choices=["topic", "problem", "decision"],
-                        help="Analysis mode")
+    parser.add_argument("--mode", required=True, choices=["topic"],
+                        help="Analysis mode (only topic supported)")
     parser.add_argument("--input", help="Input JSON file (default: stdin)")
     parser.add_argument("--output", help="Output JSON file (default: stdout)")
     parser.add_argument("--analysis-id", help="Custom analysis ID")
@@ -40,6 +40,9 @@ def run_from_args(mode, input_data=None, input_path=None, output_path=None,
 
         if not handoff:
             return _exit("Empty input", capture_output, 1)
+
+        if agent_runner is None:
+            return _exit("Agent runner is required — not provided", capture_output, 1)
 
         runner = agent_runner
         tracker = EvidenceTracker()

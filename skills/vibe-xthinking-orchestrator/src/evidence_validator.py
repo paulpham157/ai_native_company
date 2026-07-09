@@ -3,8 +3,9 @@ class EvidenceValidator:
         gaps = []
         issues = []
         conflicts = self._find_duplicates(evidence_chain)
+        gapped_indices = set()
 
-        for entry in evidence_chain:
+        for i, entry in enumerate(evidence_chain):
             source = entry.get("source", "")
             claim = entry.get("claim", "")
             conf = entry.get("confidence", 0)
@@ -15,6 +16,7 @@ class EvidenceValidator:
                     "claim": claim,
                     "issue": "Missing evidence source",
                 })
+                gapped_indices.add(i)
 
             if not claim.strip():
                 gaps.append({
@@ -22,6 +24,7 @@ class EvidenceValidator:
                     "claim": claim,
                     "issue": "Empty claim",
                 })
+                gapped_indices.add(i)
 
             if not (0 <= conf <= 1):
                 issues.append({
@@ -30,7 +33,7 @@ class EvidenceValidator:
                     "issue": f"Confidence {conf} out of range [0, 1]",
                 })
 
-        valid_count = len(evidence_chain) - len(gaps)
+        valid_count = len(evidence_chain) - len(gapped_indices)
         assessment = self._generate_assessment(len(evidence_chain), len(gaps), len(conflicts), len(issues))
 
         return {

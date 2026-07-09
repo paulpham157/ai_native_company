@@ -157,8 +157,32 @@ def main():
     )
     check("invalid mode returns non-zero", exit_code != 0)
 
-    # ── Test 8: Missing input ──
-    print("\n[8] Missing input")
+    # ── Test 8: Unsupported 'problem' mode ──
+    print("\n[8] Unsupported 'problem' mode")
+    exit_code, output = run_from_args(
+        mode="problem",
+        input_data=input_json,
+        capture_output=True,
+        agent_runner=FAKE_RUNNER,
+    )
+    check("problem mode returns non-zero", exit_code != 0)
+    check("problem mode reports unsupported",
+          isinstance(output, str) and "unknown mode" in output.lower())
+
+    # ── Test 9: Unsupported 'decision' mode ──
+    print("\n[9] Unsupported 'decision' mode")
+    exit_code, output = run_from_args(
+        mode="decision",
+        input_data=input_json,
+        capture_output=True,
+        agent_runner=FAKE_RUNNER,
+    )
+    check("decision mode returns non-zero", exit_code != 0)
+    check("decision mode reports unsupported",
+          isinstance(output, str) and "unknown mode" in output.lower())
+
+    # ── Test 10: Missing input ──
+    print("\n[10] Missing input")
     exit_code, output = run_from_args(
         mode="topic",
         input_data="",
