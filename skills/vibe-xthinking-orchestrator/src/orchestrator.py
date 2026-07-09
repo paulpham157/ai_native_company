@@ -37,6 +37,13 @@ class XThinkingOrchestrator:
                 "agents": [("analysis", "Problem Analyst")],
             },
         ],
+        "decision": [
+            {
+                "major_phase": "analysis",
+                "checkpoint_after": False,
+                "agents": [("analysis", "Decision Analyst")],
+            },
+        ],
     }
 
     def __init__(self, mode, agent_runner, evidence_tracker=None, checkpoint=None, context_provider=None, evidence_validator=None):
@@ -64,6 +71,8 @@ class XThinkingOrchestrator:
     def execute(self, handoff_brief, analysis_id=None):
         if self.mode == "problem":
             return self._execute_problem(handoff_brief, analysis_id)
+        if self.mode == "decision":
+            return self._execute_decision(handoff_brief, analysis_id)
 
         topic = handoff_brief.get("context", {}).get("industry_context", "Unknown topic")
         if not analysis_id:
@@ -242,6 +251,66 @@ class XThinkingOrchestrator:
             "framework": output.get("framework", "5-whys"),
             "root_causes": output.get("root_causes", []),
             "recommendations": output.get("recommendations", []),
+            "evidence": all_evidence,
+            "insights": insights,
+            "confidence_score": tracking_result["confidence_score"],
+            "need_review": tracking_result["need_review"],
+            "validation": validation_result,
+        }
+
+    def _execute_decision(self, handoff_brief, analysis_id):
+        decision = handoff_brief.get("context", {}).get("industry_context", "Unknown decision")
+        if not analysis_id:
+            analysis_id = f"da-{uuid.uuid4().hex[:8]}"
+
+        context = {
+            "handoff": handoff_brief,
+            "decision": decision,
+            "analysis_id": analysis_id,
+        }
+        if self.context_provider:
+            enriched = self.context_provider.enrich(handoff_brief, "analysis", "Decision Analyst")
+            context.update(enriched)
+
+        output = self.agent_runner.run("Decision Analyst", "analysis", context)
+
+        evidence_chain = []
+        all_evidence = []
+        for e in output.get("evidence", []):
+            evidence_chain.append({
+                "agent": "Decision Analyst",
+                "claim": e.get("claim", ""),
+                "confidence": e.get("confidence", 0.0),
+                "source": e.get("source", ""),
+            })
+            all_evidence.append({
+                "claim": e.get("claim", ""),
+                "confidence": e.get("confidence", 0.0),
+                "source": e.get("source", ""),
+            })
+
+        insights = [{
+            "claim": e.get("claim", ""),
+            "evidence_source": e.get("source", ""),
+            "agent": "Decision Analyst",
+        } for e in evidence_chain]
+
+        tracking_result = self.evidence_tracker.track(
+            evidence_chain=evidence_chain,
+            analysis_ref=analysis_id,
+        )
+
+        validation_result = None
+        if self.evidence_validator:
+            validation_result = self.evidence_validator.assess(evidence_chain)
+
+        return {
+            "analysis_id": analysis_id,
+            "decision": decision,
+            "mode": self.mode,
+            "framework": output.get("framework", "eisenhower"),
+            "options": output.get("options", []),
+            "recommendation": output.get("recommendation", ""),
             "evidence": all_evidence,
             "insights": insights,
             "confidence_score": tracking_result["confidence_score"],

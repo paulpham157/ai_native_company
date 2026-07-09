@@ -50,6 +50,15 @@ FAKE_OUTPUTS = {
         "recommendations": ["Improve onboarding"],
         "evidence": [{"claim": "60% cite poor onboarding", "confidence": 0.85, "source": "Exit survey"}],
     },
+    "analysis:Decision Analyst": {
+        "framework": "rice",
+        "options": [
+            {"name": "Build in-house", "scores": {"reach": 3, "impact": 4, "effort": 2}, "total": 24},
+            {"name": "Buy SaaS", "scores": {"reach": 5, "impact": 3, "effort": 4}, "total": 60},
+        ],
+        "recommendation": "Buy SaaS scores highest on RICE",
+        "evidence": [{"claim": "SaaS faster time-to-market", "confidence": 0.85, "source": "Vendor analysis"}],
+    },
 }
 
 FAKE_RUNNER = FakeAgentRunner(FAKE_OUTPUTS)
@@ -179,17 +188,22 @@ def main():
     check("output has confidence_score", "confidence_score" in result)
     check("output has need_review", "need_review" in result)
 
-    # ── Test 9: Unsupported 'decision' mode ──
-    print("\n[9] Unsupported 'decision' mode")
+    # ── Test 9: Decision mode ──
+    print("\n[9] Decision mode")
     exit_code, output = run_from_args(
         mode="decision",
         input_data=input_json,
         capture_output=True,
         agent_runner=FAKE_RUNNER,
     )
-    check("decision mode returns non-zero", exit_code != 0)
-    check("decision mode reports unsupported",
-          isinstance(output, str) and "unknown mode" in output.lower())
+    check("decision mode returns zero", exit_code == 0, f"got {exit_code}")
+    result = json.loads(output)
+    check("output mode is decision", result.get("mode") == "decision")
+    check("output has framework", "framework" in result)
+    check("output has options", len(result.get("options", [])) > 0)
+    check("output has recommendation", "recommendation" in result)
+    check("output has confidence_score", "confidence_score" in result)
+    check("output has need_review", "need_review" in result)
 
     # ── Test 10: Missing input ──
     print("\n[10] Missing input")

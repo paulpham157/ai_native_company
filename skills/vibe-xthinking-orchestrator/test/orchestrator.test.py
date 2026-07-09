@@ -307,6 +307,96 @@ def main():
         check("error message mentions mode", "mode" in str(e).lower(),
               f"message: {e}")
 
+    # ── Test 15: Decision mode execution ──
+    print("\n[15] Decision mode execution")
+    handoff_decision = {
+        "request_id": "req-decision-001",
+        "analysis_type": "decision",
+        "context": {
+            "industry_context": "Build vs buy for customer analytics platform",
+        },
+        "evidence": [],
+        "confidence_score": 0.8,
+        "need_review": False,
+    }
+
+    fake_decision_outputs = {
+        "analysis:Decision Analyst": {
+            "framework": "rice",
+            "options": [
+                {"name": "Build in-house", "scores": {"reach": 3, "impact": 4, "effort": 2}, "total": 24},
+                {"name": "Buy SaaS", "scores": {"reach": 5, "impact": 3, "effort": 4}, "total": 60},
+            ],
+            "recommendation": "Buy SaaS scores highest on RICE",
+            "evidence": [
+                {"claim": "SaaS faster time-to-market", "confidence": 0.85, "source": "Vendor analysis"},
+            ],
+        },
+    }
+    fake_decision = FakeAgentRunner(fake_decision_outputs)
+    orch_d = XThinkingOrchestrator(mode="decision", agent_runner=fake_decision, evidence_tracker=EvidenceTracker())
+    result_d = orch_d.execute(handoff_decision)
+
+    check("result is dict", isinstance(result_d, dict))
+    check("has analysis_id", "analysis_id" in result_d)
+    check("decision matches handoff context", result_d.get("decision") == "Build vs buy for customer analytics platform")
+    check("mode is decision", result_d.get("mode") == "decision")
+    check("has framework", result_d.get("framework") == "rice")
+    check("has options", len(result_d.get("options", [])) == 2)
+    check("option has name/scores", "name" in result_d["options"][0] and "scores" in result_d["options"][0])
+    check("option has total", "total" in result_d["options"][0])
+    check("has recommendation", result_d.get("recommendation") == "Buy SaaS scores highest on RICE")
+    check("has evidence list", "evidence" in result_d and len(result_d["evidence"]) > 0)
+    check("has confidence_score", "confidence_score" in result_d)
+    check("confidence_score in [0,1]", 0 <= result_d["confidence_score"] <= 1)
+    check("has need_review", "need_review" in result_d)
+    check("need_review is bool", isinstance(result_d["need_review"], bool))
+    check("has insights", "insights" in result_d and len(result_d["insights"]) > 0)
+    for ins in result_d["insights"]:
+        check("insight has claim/evidence_source/agent",
+              "claim" in ins and "evidence_source" in ins and "agent" in ins)
+
+    # ── Test 16: Decision mode schema compliance ──
+    print("\n[16] Decision mode schema compliance")
+    decision_schema = schemas.get("decision-analysis.schema.json")
+    if decision_schema:
+        errs = validate(decision_schema, result_d)
+        check("output validates against decision-analysis.schema.json", not errs,
+              "; ".join(e.message for e in errs[:3]))
+    else:
+        check("decision-analysis.schema.json exists", False)
+
+    # ── Test 17: Decision mode custom analysis_id ──
+    print("\n[17] Decision mode custom analysis_id")
+    handoff_d2 = {
+        "request_id": "req-decision-002",
+        "analysis_type": "decision",
+        "context": {"industry_context": "Test decision"},
+        "evidence": [],
+        "confidence_score": 0.8,
+        "need_review": False,
+    }
+    fake_d2 = FakeAgentRunner(fake_decision_outputs)
+    orch_d2 = XThinkingOrchestrator(mode="decision", agent_runner=fake_d2, evidence_tracker=EvidenceTracker())
+    result_d2 = orch_d2.execute(handoff_d2, analysis_id="decision-custom-001")
+    check("custom analysis_id used", result_d2.get("analysis_id") == "decision-custom-001")
+
+    # ── Test 18: Decision mode empty/minimal input ──
+    print("\n[18] Decision mode empty/minimal input")
+    fake_empty_d = FakeAgentRunner({})
+    orch_empty_d = XThinkingOrchestrator(mode="decision", agent_runner=fake_empty_d, evidence_tracker=EvidenceTracker())
+    try:
+        result_empty = orch_empty_d.execute({"request_id": "empty-decision"})
+        check("executes with minimal decision input", True)
+        check("decision falls back to Unknown", result_empty.get("decision") == "Unknown decision")
+        check("framework defaults to eisenhower", result_empty.get("framework") == "eisenhower")
+        check("empty options", len(result_empty.get("options", [])) == 0)
+        check("empty recommendation", result_empty.get("recommendation") == "")
+        check("confidence_score defaults to 0", result_empty.get("confidence_score") == 0.0)
+        check("insights is empty list", result_empty.get("insights") == [])
+    except Exception as e:
+        check("handles empty decision input gracefully", False, str(e))
+
     print("\n" + "=" * 60)
     print(f"Result: {passed} passed, {failed} failed")
     print("=" * 60)
