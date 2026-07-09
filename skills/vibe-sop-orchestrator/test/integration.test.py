@@ -154,7 +154,7 @@ def main():
 
         if is_link:
             resolved = os.path.realpath(str(sop_path))
-            expected_target = str(company_path)
+            expected_target = os.path.realpath(str(company_path))
             runner.check(f"'{name}' symlink resolves to company-orchestrator/script/{name}",
                          resolved == expected_target,
                          f"resolves to {resolved}, expected {expected_target}")

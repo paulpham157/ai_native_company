@@ -1,0 +1,9 @@
+{
+  "analysis_id": "da-invalid-001",
+  "mode": "topic",
+  "framework": "unknown",
+  "options": "not-an-array",
+  "evidence": [],
+  "confidence_score": -1,
+  "need_review": 0
+}

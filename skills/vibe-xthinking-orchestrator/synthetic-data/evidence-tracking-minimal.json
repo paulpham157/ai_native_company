@@ -1,0 +1,11 @@
+{
+  "tracking_id": "et-minimal-001",
+  "analysis_ref": "ta-001",
+  "evidence_chain": [
+    {"agent": "Researcher", "claim": "Market data supports hypothesis", "confidence": 0.8, "source": "Industry report"}
+  ],
+  "aggregate_confidence": 0.8,
+  "evidence": [{"claim": "Aggregated from research phase", "confidence": 0.8, "source": "ta-001"}],
+  "confidence_score": 0.8,
+  "need_review": false
+}

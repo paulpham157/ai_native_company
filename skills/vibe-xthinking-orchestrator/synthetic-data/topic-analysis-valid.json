@@ -1,0 +1,49 @@
+{
+  "analysis_id": "ta-001",
+  "topic": "Cloud Migration Strategy for FinTech",
+  "mode": "topic",
+  "phases": [
+    {
+      "phase": "research",
+      "agent": "Researcher",
+      "output": {
+        "market_trends": "Cloud adoption in FinTech growing 35% YoY",
+        "regulatory": "MAS guidelines require data residency in Singapore",
+        "competitors": ["Stripe", "Square", "Adyen"]
+      }
+    },
+    {
+      "phase": "thinking",
+      "agent": "Explicit Thinker",
+      "output": {
+        "assumptions": ["Cloud infra is more secure than on-prem"],
+        "gaps": ["Zero trust architecture depth unknown"]
+      }
+    },
+    {
+      "phase": "synthesis",
+      "agent": "Synthesizer",
+      "output": {
+        "key_insight": "Phased migration to reduce risk, starting with non-critical workloads"
+      }
+    },
+    {
+      "phase": "validation",
+      "agent": "Validator",
+      "output": {
+        "confidence": 0.82,
+        "gaps_identified": ["Cost projection for year 2-3"]
+      }
+    }
+  ],
+  "insights": [
+    {"claim": "Phased migration reduces operational risk", "evidence": "Industry case studies", "source": "AWS Migration Handbook"},
+    {"claim": "Data residency is critical regulatory requirement", "evidence": "MAS Technology Risk Management guidelines", "source": "MAS TRM 2024"}
+  ],
+  "evidence": [
+    {"claim": "FinTech cloud adoption growing 35% YoY", "confidence": 0.9, "source": "IDC Financial Insights 2025"},
+    {"claim": "MAS requires data residency for financial data", "confidence": 0.85, "source": "MAS TRM Guidelines Section 4.2"}
+  ],
+  "confidence_score": 0.82,
+  "need_review": false
+}

@@ -1,0 +1,37 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "handoff-brief.schema.json",
+  "title": "XThinking Handoff Brief",
+  "description": "Handoff brief schema cho vibe-xthinking-orchestrator từ upstream skills.",
+  "type": "object",
+  "required": ["request_id", "analysis_type", "context", "evidence", "confidence_score", "need_review"],
+  "properties": {
+    "request_id": {"type": "string"},
+    "analysis_type": {"type": "string", "enum": ["topic", "problem", "decision"]},
+    "context": {
+      "type": "object",
+      "required": ["charter_summary", "okr_summary", "industry_context"],
+      "properties": {
+        "charter_summary": {"type": "string"},
+        "okr_summary": {"type": "string"},
+        "industry_context": {"type": "string"}
+      }
+    },
+    "key_questions": {
+      "type": "array",
+      "items": {"type": "string"}
+    },
+    "evidence": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "claim": {"type": "string"},
+          "source": {"type": "string"}
+        }
+      }
+    },
+    "confidence_score": {"type": "number", "minimum": 0, "maximum": 1},
+    "need_review": {"type": "boolean"}
+  }
+}

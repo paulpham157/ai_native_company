@@ -1,0 +1,29 @@
+{
+  "$schema": "./schema/skill-meta.schema.json",
+  "name": "vibe-xthinking-orchestrator",
+  "version": "2.0.0",
+  "type": "skill",
+  "description": "XThinking Orchestrator — Explicit thinking, phân tích sâu industry/domain với 3 modes: TOPIC (multi-agent), PROBLEM (single-agent), DECISION (single-agent). Đồng bộ Schema & Guardrail contract với vibe-company-orchestrator — emit evidence/confidence/need_review cho mọi artifact.",
+  "integrations": {
+    "upstream": ["vibe-company-orchestrator", "vibe-sop-orchestrator"],
+    "downstream": ["vibe-review"],
+    "schema_contract": {
+      "enforces_8_components": true,
+      "emits_evidence_confidence": ["topic-analysis", "problem-analysis", "decision-analysis"],
+      "handoff_brief_schema": "./schema/handoff-brief.schema.json"
+    }
+  },
+  "schemas": [
+    "./schema/topic-analysis.schema.json",
+    "./schema/problem-analysis.schema.json",
+    "./schema/decision-analysis.schema.json",
+    "./schema/explicit-thinking.schema.json",
+    "./schema/evidence-tracking.schema.json"
+  ],
+  "guardrails": {
+    "evidence_required": true,
+    "confidence_threshold": 0.7,
+    "hooks_protected_paths": ["template/", "archive/"],
+    "execution_log": "output/execution_log.jsonl"
+  }
+}

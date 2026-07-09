@@ -1,0 +1,8 @@
+{
+  "analysis_id": "ta-invalid-001",
+  "topic": "",
+  "mode": "invalid-mode",
+  "evidence": [],
+  "confidence_score": 1.5,
+  "need_review": "not-a-boolean"
+}
