@@ -1,0 +1,11 @@
+{
+  "analysis_id": "da-minimal-001",
+  "decision": "Choose cloud provider",
+  "mode": "decision",
+  "framework": "decision-matrix",
+  "options": [{"name": "AWS", "scores": {"cost": 3, "features": 4}}],
+  "recommendation": "AWS",
+  "evidence": [{"claim": "AWS leads on feature coverage", "confidence": 0.7, "source": "Gartner Magic Quadrant"}],
+  "confidence_score": 0.7,
+  "need_review": false
+}

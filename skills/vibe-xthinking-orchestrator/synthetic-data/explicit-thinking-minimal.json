@@ -1,0 +1,10 @@
+{
+  "thinking_id": "et-minimal-001",
+  "analysis_ref": "ta-001",
+  "assumptions": [{"assumption": "Cloud is more secure than on-prem", "confidence": 0.7}],
+  "logic_chain": [{"step": "1", "premise": "Cloud providers invest more in security", "conclusion": "Cloud is more secure"}],
+  "gaps": [{"gap": "Zero trust architecture not evaluated", "severity": "medium"}],
+  "evidence": [{"claim": "Security assumption based on industry benchmarks", "confidence": 0.7, "source": "CSA report"}],
+  "confidence_score": 0.72,
+  "need_review": false
+}

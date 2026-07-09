@@ -1,0 +1,25 @@
+{
+  "analysis_id": "pa-001",
+  "problem": "High customer churn rate in B2B SaaS product",
+  "mode": "problem",
+  "framework": "fishbone",
+  "root_causes": [
+    {"cause": "Poor onboarding experience", "level": 1, "category": "process"},
+    {"cause": "No dedicated CSM for <50 users accounts", "level": 2, "category": "people"},
+    {"cause": "Product lacks key integrations", "level": 1, "category": "technology"},
+    {"cause": "Pricing not competitive for SMB segment", "level": 2, "category": "strategy"}
+  ],
+  "recommendations": [
+    "Implement structured onboarding with milestones",
+    "Assign CSM to all accounts regardless of size",
+    "Build top 10 requested integrations in next quarter",
+    "Introduce SMB pricing tier"
+  ],
+  "evidence": [
+    {"claim": "60% of churned customers cite poor onboarding", "confidence": 0.85, "source": "Exit survey Q2 2025"},
+    {"claim": "Average time-to-value is 45 days vs industry 14 days", "confidence": 0.8, "source": "Product analytics"},
+    {"claim": "Competitors offer 3x more integrations", "confidence": 0.75, "source": "Competitive analysis report"}
+  ],
+  "confidence_score": 0.85,
+  "need_review": false
+}

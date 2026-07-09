@@ -1,0 +1,8 @@
+{
+  "tracking_id": "",
+  "analysis_ref": 123,
+  "evidence_chain": "not-an-array",
+  "evidence": [],
+  "confidence_score": "invalid-string",
+  "need_review": null
+}

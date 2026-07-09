@@ -1,0 +1,10 @@
+{
+  "analysis_id": "pa-minimal-001",
+  "problem": "High customer churn rate",
+  "mode": "problem",
+  "framework": "5-whys",
+  "root_causes": [{"cause": "Poor onboarding experience", "level": 1}],
+  "evidence": [{"claim": "Customer feedback indicates onboarding friction", "confidence": 0.75, "source": "Support tickets Q2"}],
+  "confidence_score": 0.7,
+  "need_review": false
+}

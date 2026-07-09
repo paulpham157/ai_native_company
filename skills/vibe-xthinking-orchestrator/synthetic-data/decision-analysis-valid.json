@@ -1,0 +1,31 @@
+{
+  "analysis_id": "da-001",
+  "decision": "Choose cloud provider for FinTech platform",
+  "mode": "decision",
+  "framework": "rice",
+  "options": [
+    {
+      "name": "AWS",
+      "scores": {"reach": 8, "impact": 7, "confidence": 6, "effort": 5},
+      "total": 6.7
+    },
+    {
+      "name": "GCP",
+      "scores": {"reach": 6, "impact": 8, "confidence": 7, "effort": 4},
+      "total": 8.4
+    },
+    {
+      "name": "Azure",
+      "scores": {"reach": 7, "impact": 6, "confidence": 8, "effort": 6},
+      "total": 5.6
+    }
+  ],
+  "recommendation": "GCP with AWS as fallback for data residency",
+  "evidence": [
+    {"claim": "GCP offers best ML/AI capabilities for fraud detection", "confidence": 0.85, "source": "GCP AI documentation"},
+    {"claim": "AWS has broader compliance certifications for FinTech", "confidence": 0.9, "source": "AWS compliance center"},
+    {"claim": "Azure leads in enterprise identity integration", "confidence": 0.8, "source": "Microsoft identity docs"}
+  ],
+  "confidence_score": 0.78,
+  "need_review": false
+}

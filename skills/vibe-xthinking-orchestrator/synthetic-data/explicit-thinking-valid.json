@@ -1,0 +1,26 @@
+{
+  "thinking_id": "et-001",
+  "analysis_ref": "ta-001",
+  "assumptions": [
+    {"assumption": "Cloud infrastructure is more secure than on-premises data centers", "confidence": 0.8, "challenge": "Shared responsibility model means security is still partly customer's job"},
+    {"assumption": "Migration can be completed within 12 months", "confidence": 0.6, "challenge": "Regulatory approvals may take 6-8 months"},
+    {"assumption": "Total cost of ownership will decrease by 30%", "confidence": 0.7, "challenge": "Data egress costs could offset savings"}
+  ],
+  "logic_chain": [
+    {"step": "1", "premise": "FinTech companies need high security and compliance", "conclusion": "Cloud providers with compliance certs are preferred"},
+    {"step": "2", "premise": "MAS requires data residency in Singapore", "conclusion": "Provider must have Singapore region with local support"},
+    {"step": "3", "premise": "Multiple providers offer Singapore regions", "conclusion": "Selection based on additional criteria (ML, integrations, pricing)"}
+  ],
+  "gaps": [
+    {"gap": "Zero trust architecture evaluation not performed", "severity": "high"},
+    {"gap": "Data migration strategy for legacy systems unclear", "severity": "medium"},
+    {"gap": "Cost projection for year 2-3 of migration not modeled", "severity": "medium"}
+  ],
+  "evidence": [
+    {"claim": "Cloud providers invest 2x more in security than average enterprise", "confidence": 0.8, "source": "Gartner security report 2025"},
+    {"claim": "MAS Technology Risk Management guidelines Section 4.2 mandates data residency", "confidence": 0.85, "source": "MAS TRM 2024"},
+    {"claim": "AWS, GCP, Azure all offer Singapore regions with financial services compliance", "confidence": 0.9, "source": "Provider compliance documentation"}
+  ],
+  "confidence_score": 0.72,
+  "need_review": false
+}

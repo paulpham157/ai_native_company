@@ -1,0 +1,18 @@
+{
+  "tracking_id": "et-001",
+  "analysis_ref": "ta-001",
+  "evidence_chain": [
+    {"agent": "Researcher", "claim": "Cloud adoption in FinTech growing 35% YoY", "confidence": 0.9, "source": "IDC Financial Insights 2025"},
+    {"agent": "Explicit Thinker", "claim": "Migration to cloud reduces infra cost by 40%", "confidence": 0.75, "source": "AWS TCO calculator"},
+    {"agent": "Value Chain Analyst", "claim": "Cloud enables faster time-to-market for new features", "confidence": 0.85, "source": "Porter value chain analysis"},
+    {"agent": "Synthesizer", "claim": "Phased migration with non-critical workloads first reduces risk", "confidence": 0.82, "source": "Synthesis of all agent outputs"},
+    {"agent": "Validator", "claim": "Analysis is sound but cost projection for year 2-3 needs refinement", "confidence": 0.78, "source": "Cross-validation report"}
+  ],
+  "aggregate_confidence": 0.82,
+  "evidence": [
+    {"claim": "All agents agree on phased migration approach", "confidence": 0.82, "source": "Evidence chain aggregation"},
+    {"claim": "Highest confidence finding: market growth trend", "confidence": 0.9, "source": "Researcher output"}
+  ],
+  "confidence_score": 0.82,
+  "need_review": false
+}

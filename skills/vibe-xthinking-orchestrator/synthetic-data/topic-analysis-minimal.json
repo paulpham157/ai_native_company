@@ -1,0 +1,15 @@
+{
+  "analysis_id": "ta-minimal-001",
+  "topic": "Cloud Migration Strategy",
+  "mode": "topic",
+  "phases": [
+    {
+      "phase": "research",
+      "agent": "Researcher",
+      "output": {"findings": "Cloud adoption growing 25% YoY"}
+    }
+  ],
+  "evidence": [{"claim": "Based on industry report", "confidence": 0.8, "source": "Gartner 2025"}],
+  "confidence_score": 0.75,
+  "need_review": false
+}
