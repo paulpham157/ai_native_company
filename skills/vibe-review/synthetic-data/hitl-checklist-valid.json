@@ -1,0 +1,18 @@
+{
+  "checklist_id": "sop-hitl-checklist-v1",
+  "artifact_type": "markdown",
+  "items": [
+    {
+      "item_id": "H001",
+      "question": "Are the SLAs in section 3.2 approved by the client?",
+      "rationale": "SLAs require client sign-off per company policy",
+      "confidence_threshold": 0.8
+    },
+    {
+      "item_id": "H002",
+      "question": "Is the budget in section 5 within acceptable range?",
+      "rationale": "Budget decisions require human approval",
+      "confidence_threshold": 0.9
+    }
+  ]
+}

@@ -1,0 +1,64 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "review-result.schema.json",
+  "title": "Review Result",
+  "description": "Output schema cho vibe-review — kết quả review artifact với evidence/confidence_score/need_review.",
+  "type": "object",
+  "required": ["artifact_path", "artifact_type", "evidence", "confidence_score", "need_review"],
+  "properties": {
+    "artifact_path": {
+      "type": "string",
+      "description": "Path to the reviewed artifact"
+    },
+    "artifact_type": {
+      "type": "string",
+      "enum": ["markdown", "json", "yaml", "unsupported"],
+      "description": "Detected artifact type based on file extension"
+    },
+    "issues": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "severity": {
+            "type": "string",
+            "enum": ["error", "warning", "info"]
+          },
+          "message": {
+            "type": "string"
+          },
+          "location": {
+            "type": "string"
+          }
+        },
+        "required": ["severity", "message"]
+      }
+    },
+    "summary": {
+      "type": "string",
+      "description": "Human-readable review summary"
+    },
+    "evidence": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "source": {"type": "string"},
+          "detail": {"type": "string"}
+        },
+        "required": ["source", "detail"]
+      },
+      "description": "Data hoặc reasoning support kết luận review"
+    },
+    "confidence_score": {
+      "type": "number",
+      "minimum": 0,
+      "maximum": 1,
+      "description": "Độ tin cậy của review result (0-1)"
+    },
+    "need_review": {
+      "type": "boolean",
+      "description": "Flag nếu confidence thấp hoặc evidence yếu"
+    }
+  }
+}

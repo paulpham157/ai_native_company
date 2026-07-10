@@ -1,0 +1,31 @@
+{
+  "$schema": "./schema/skill-meta.schema.json",
+  "name": "vibe-review",
+  "version": "2.0.0",
+  "type": "skill",
+  "description": "Universal Reviewer — review Markdown, JSON, YAML artifacts with evidence/confidence/need_review. Auto-detects artifact type by file extension with fallback for unsupported types.",
+  "universal_reviewer": true,
+  "integrations": {
+    "upstream": ["vibe-company-orchestrator", "vibe-sop-orchestrator", "vibe-xthinking-orchestrator", "vibe-aiworkforce"],
+    "downstream": [],
+    "schema_contract": {
+      "enforces_8_components": true,
+      "emits_evidence_confidence": ["review-result"],
+      "artifact_types": ["markdown", "json", "yaml"]
+    }
+  },
+  "schemas": [
+    "./schema/review-result.schema.json",
+    "./schema/quality-rubric.schema.json",
+    "./schema/review-rules.schema.json",
+    "./schema/hitl-checklist.schema.json",
+    "./schema/artifact-type-map.schema.json",
+    "./schema/skill-meta.schema.json"
+  ],
+  "guardrails": {
+    "evidence_required": true,
+    "confidence_threshold": 0.7,
+    "hooks_protected_paths": ["template/", "archive/"],
+    "execution_log": "output/execution_log.jsonl"
+  }
+}

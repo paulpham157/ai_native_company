@@ -1,0 +1,25 @@
+{
+  "artifact_path": "/path/to/sample-doc.md",
+  "artifact_type": "markdown",
+  "issues": [
+    {
+      "severity": "warning",
+      "message": "Section headers do not follow consistent casing",
+      "location": "line 15"
+    },
+    {
+      "severity": "info",
+      "message": "Consider adding a table of contents",
+      "location": "line 1"
+    }
+  ],
+  "summary": "2 minor issues found. Overall quality is good.",
+  "evidence": [
+    {
+      "source": "markdown-reviewer",
+      "detail": "Scanned 45 lines, found 2 style inconsistencies"
+    }
+  ],
+  "confidence_score": 0.85,
+  "need_review": false
+}

@@ -1,0 +1,50 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "artifact-type-map.schema.json",
+  "title": "Artifact Type Map",
+  "description": "Schema cho mapping file extension → artifact type. Hỗ trợ custom reviewers qua extension point.",
+  "type": "object",
+  "required": ["type_map", "fallback"],
+  "properties": {
+    "type_map": {
+      "type": "object",
+      "description": "Mapping từ file extension (không bao gồm dấu chấm) sang artifact type string",
+      "patternProperties": {
+        "^[a-z0-9]+$": {
+          "type": "string",
+          "enum": ["markdown", "json", "yaml"]
+        }
+      },
+      "additionalProperties": false,
+      "minProperties": 1
+    },
+    "fallback": {
+      "type": "string",
+      "enum": ["markdown", "json", "yaml", "unsupported"],
+      "description": "Default type khi extension không có trong type_map"
+    },
+    "custom_reviewers": {
+      "type": "array",
+      "description": "Extension point — custom reviewers cho new artifact types",
+      "items": {
+        "type": "object",
+        "properties": {
+          "type": {
+            "type": "string",
+            "description": "Artifact type name"
+          },
+          "extensions": {
+            "type": "array",
+            "items": {"type": "string"},
+            "description": "File extensions for this custom type"
+          },
+          "handler": {
+            "type": "string",
+            "description": "Path or identifier for the custom review handler"
+          }
+        },
+        "required": ["type", "extensions", "handler"]
+      }
+    }
+  }
+}

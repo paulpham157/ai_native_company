@@ -1,0 +1,11 @@
+{
+  "rule_set_id": "broken-rules",
+  "artifact_type": "yaml",
+  "rules": [
+    {
+      "rule_id": "X001",
+      "category": "unknown-category",
+      "severity": "critical"
+    }
+  ]
+}

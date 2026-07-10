@@ -1,0 +1,9 @@
+{
+  "artifact_path": "/path/to/broken-doc.md",
+  "artifact_type": "markdown",
+  "issues": "this should be an array, not a string",
+  "summary": 42,
+  "evidence": "not-a-list",
+  "confidence_score": -1,
+  "need_review": "maybe"
+}

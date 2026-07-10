@@ -1,0 +1,47 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "hitl-checklist.schema.json",
+  "title": "Human-in-the-Loop Checklist",
+  "description": "Checklist cho Method 4 — flag items cần human review khi AI không đủ confidence.",
+  "type": "object",
+  "required": ["checklist_id", "artifact_type", "items"],
+  "properties": {
+    "checklist_id": {
+      "type": "string",
+      "description": "Unique identifier cho checklist"
+    },
+    "artifact_type": {
+      "type": "string",
+      "enum": ["markdown", "json", "yaml"],
+      "description": "Loại artifact mà checklist này áp dụng"
+    },
+    "items": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["item_id", "question", "rationale"],
+        "properties": {
+          "item_id": {
+            "type": "string",
+            "description": "Unique identifier cho checklist item"
+          },
+          "question": {
+            "type": "string",
+            "description": "Câu hỏi cần human trả lời"
+          },
+          "rationale": {
+            "type": "string",
+            "description": "Lý do AI không tự quyết định được — confidence thấp, ambiguity, critical impact"
+          },
+          "confidence_threshold": {
+            "type": "number",
+            "minimum": 0,
+            "maximum": 1,
+            "description": "Nếu confidence_score < threshold này → cần HITL review"
+          }
+        }
+      },
+      "minItems": 1
+    }
+  }
+}
