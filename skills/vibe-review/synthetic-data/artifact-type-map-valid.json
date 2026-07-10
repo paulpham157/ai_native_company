@@ -1,0 +1,11 @@
+{
+  "type_map": {
+    "md": "markdown",
+    "markdown": "markdown",
+    "json": "json",
+    "yaml": "yaml",
+    "yml": "yaml"
+  },
+  "fallback": "unsupported",
+  "custom_reviewers": []
+}

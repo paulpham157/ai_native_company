@@ -1,0 +1,1 @@
+../../vibe-company-orchestrator/script/install_hooks.sh

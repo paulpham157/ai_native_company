@@ -1,0 +1,7 @@
+{
+  "type_map": {
+    "md": "unknown-type",
+    "exe": "binary"
+  },
+  "fallback": "invalid"
+}

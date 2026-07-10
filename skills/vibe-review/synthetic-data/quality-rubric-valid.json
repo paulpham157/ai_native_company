@@ -1,0 +1,36 @@
+{
+  "rubric_id": "sop-markdown-rubric-v1",
+  "artifact_type": "markdown",
+  "dimensions": [
+    {
+      "name": "clarity",
+      "weight": 0.3,
+      "criteria": [
+        {"level": "excellent", "description": "Clear, concise, easy to follow"},
+        {"level": "good", "description": "Mostly clear with minor ambiguities"},
+        {"level": "needs_improvement", "description": "Several unclear sections"},
+        {"level": "poor", "description": "Confusing or contradictory"}
+      ]
+    },
+    {
+      "name": "completeness",
+      "weight": 0.4,
+      "criteria": [
+        {"level": "excellent", "description": "All required sections present"},
+        {"level": "good", "description": "Most sections present"},
+        {"level": "needs_improvement", "description": "Missing several sections"},
+        {"level": "poor", "description": "Major sections missing"}
+      ]
+    },
+    {
+      "name": "accuracy",
+      "weight": 0.3,
+      "criteria": [
+        {"level": "excellent", "description": "Factually correct, well-referenced"},
+        {"level": "good", "description": "Minor inaccuracies"},
+        {"level": "needs_improvement", "description": "Several inaccuracies"},
+        {"level": "poor", "description": "Critical errors"}
+      ]
+    }
+  ]
+}

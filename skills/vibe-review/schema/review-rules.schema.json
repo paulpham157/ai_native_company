@@ -1,0 +1,51 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "review-rules.schema.json",
+  "title": "Review Rules",
+  "description": "Rules-based review configuration — grammar, format, required sections checks cho Method 1.",
+  "type": "object",
+  "required": ["rule_set_id", "artifact_type", "rules"],
+  "properties": {
+    "rule_set_id": {
+      "type": "string",
+      "description": "Unique identifier cho rule set"
+    },
+    "artifact_type": {
+      "type": "string",
+      "enum": ["markdown", "json", "yaml"],
+      "description": "Loại artifact mà rule set này áp dụng"
+    },
+    "rules": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["rule_id", "category", "description", "severity"],
+        "properties": {
+          "rule_id": {
+            "type": "string",
+            "description": "Unique identifier cho rule"
+          },
+          "category": {
+            "type": "string",
+            "enum": ["grammar", "format", "required_sections", "naming", "structure"],
+            "description": "Category của rule"
+          },
+          "description": {
+            "type": "string",
+            "description": "Mô tả rule và cách kiểm tra"
+          },
+          "severity": {
+            "type": "string",
+            "enum": ["error", "warning", "info"],
+            "description": "Mức độ nghiêm trọng nếu vi phạm"
+          },
+          "pattern": {
+            "type": "string",
+            "description": "Regex pattern hoặc điều kiện kiểm tra (optional)"
+          }
+        }
+      },
+      "minItems": 1
+    }
+  }
+}

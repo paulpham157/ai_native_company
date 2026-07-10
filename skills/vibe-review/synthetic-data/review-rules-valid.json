@@ -1,0 +1,24 @@
+{
+  "rule_set_id": "sop-markdown-rules-v1",
+  "artifact_type": "markdown",
+  "rules": [
+    {
+      "rule_id": "R001",
+      "category": "required_sections",
+      "description": "SOP must have an Overview section",
+      "severity": "error"
+    },
+    {
+      "rule_id": "R002",
+      "category": "format",
+      "description": "Headers must use consistent casing",
+      "severity": "warning"
+    },
+    {
+      "rule_id": "R003",
+      "category": "grammar",
+      "description": "No spelling errors in content",
+      "severity": "error"
+    }
+  ]
+}
