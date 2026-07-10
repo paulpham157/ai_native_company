@@ -85,6 +85,10 @@ def get_company_dir() -> Path:
     return get_skill_dir().parent / "vibe-company-orchestrator"
 
 
+def get_xthinking_dir() -> Path:
+    return get_skill_dir().parent / "vibe-xthinking-orchestrator"
+
+
 # ============================================================================
 # Fixture-coverage guard: every fixture must be mapped or explicitly excluded.
 # Fixtures prefixed with "_" or whose stem contains "-ignore" are excluded.
@@ -440,6 +444,44 @@ def main():
     runner.check("null instance generates errors", len(errs) > 0)
     errs = validate_instance([], content_schema)
     runner.check("array instance (expected object) generates errors", len(errs) > 0)
+
+    # ========================================================================
+    # SLICE 6: Downstream Handoff — SOP ↔ XThinking
+    # ========================================================================
+    print("\n[6] Downstream handoff — sop-orchestrator → xthinking-orchestrator")
+
+    XTHINK_DIR = get_xthinking_dir()
+    runner.check("xthinking-orchestrator dir exists", XTHINK_DIR.is_dir())
+
+    # 6a. SOP declares xthinking as downstream in skill.json
+    xthink_downstream = sop_skill_json.get("integrations", {}).get("downstream", [])
+    runner.check(
+        "sop-orchestrator declares 'vibe-xthinking-orchestrator' as downstream",
+        "vibe-xthinking-orchestrator" in xthink_downstream,
+        f"downstream = {xthink_downstream}",
+    )
+
+    # 6b. Handoff schema exists on both sides
+    sop_handoff_schema = SKILL_DIR / "schema" / "xthinking-handoff-brief.schema.json"
+    xthink_handoff_schema = XTHINK_DIR / "schema" / "handoff-brief.schema.json"
+    runner.check("sop xthinking-handoff-brief.schema.json exists",
+                 sop_handoff_schema.is_file())
+    runner.check("xthinking handoff-brief.schema.json exists",
+                 xthink_handoff_schema.is_file())
+
+    # 6c. Cross-validate: sop handoff schema can be parsed
+    sop_schema = json.loads(sop_handoff_schema.read_text())
+    runner.check("sop handoff schema is valid JSON", isinstance(sop_schema, dict))
+    xthink_schema = json.loads(xthink_handoff_schema.read_text())
+    runner.check("xthinking handoff schema is valid JSON", isinstance(xthink_schema, dict))
+
+    # 6d. Evidence contract alignment: both schemas share the 3 required fields
+    for field in ["evidence", "confidence_score", "need_review"]:
+        runner.check(
+            f"both schemas define '{field}'",
+            field in sop_schema.get("required", [])
+            and field in xthink_schema.get("required", []),
+        )
 
     return runner.summary()
 

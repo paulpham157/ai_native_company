@@ -393,6 +393,114 @@ def main():
     errs = validate_instance([], topic_schema)
     runner.check("array instance (expected object) generates errors", len(errs) > 0)
 
+    # ========================================================================
+    # SLICE 6: Handoff Round-Trip — XThinking ↔ SOP
+    # ========================================================================
+    print("\n[6] Handoff round-trip — xthinking ↔ sop handoff-brief cross-validation")
+
+    sop_synthetic_dir = SOP_DIR / "synthetic-data"
+    xthink_schemas_dir = SKILL_DIR / "schema"
+    handoff_schema_path = xthink_schemas_dir / "handoff-brief.schema.json"
+
+    # 6a. Handoff fixtures: valid fixtures pass xthinking schema
+    print("\n  6a. SOP handoff fixtures validate against xthinking handoff-brief.schema")
+    SOP_HANDOFF_MAP = {
+        "deep-mode-handoff-valid": "handoff-brief.schema.json",
+        "deep-mode-handoff-minimal": "handoff-brief.schema.json",
+    }
+    for fixture_name, schema_name in sorted(SOP_HANDOFF_MAP.items()):
+        fixture_path = sop_synthetic_dir / f"{fixture_name}.json"
+        schema_path = xthink_schemas_dir / schema_name
+        if fixture_path.is_file() and schema_path.is_file():
+            result = validate_artifact(str(fixture_path), str(schema_path))
+            runner.check(
+                f"sop:{fixture_name}.json vs xthinking:{schema_name}",
+                result["ok"],
+                "; ".join(result["errors"][:3]),
+            )
+        else:
+            missing = [p for p, ok in [(fixture_name, fixture_path.is_file()),
+                                       (schema_name, schema_path.is_file())] if not ok]
+            runner.check(f"sop:{fixture_name}.json vs xthinking:{schema_name}", False,
+                         f"missing: {missing}")
+
+    # 6b. Handoff fixtures: invalid fixtures rejected by xthinking schema
+    print("\n  6b. SOP invalid handoff fixtures rejected by xthinking schema")
+    SOP_HANDOFF_INVALID_MAP = {
+        "deep-mode-handoff-invalid": "handoff-brief.schema.json",
+    }
+    for fixture_name, schema_name in sorted(SOP_HANDOFF_INVALID_MAP.items()):
+        fixture_path = sop_synthetic_dir / f"{fixture_name}.json"
+        schema_path = xthink_schemas_dir / schema_name
+        if fixture_path.is_file() and schema_path.is_file():
+            result = validate_artifact(str(fixture_path), str(schema_path))
+            runner.check(
+                f"sop:{fixture_name}.json rejected by xthinking:{schema_name}",
+                not result["ok"],
+                f"expected rejection, got ok=True",
+            )
+        else:
+            missing = [p for p, ok in [(fixture_name, fixture_path.is_file()),
+                                       (schema_name, schema_path.is_file())] if not ok]
+            runner.check(f"sop:{fixture_name}.json rejected by xthinking schema", False,
+                         f"missing: {missing}")
+
+    # 6c. Fixture-coverage guard: all sop deep-mode-handoff fixtures are mapped
+    print("\n  6c. Fixture-coverage guard — all sop handoff fixtures mapped")
+    sop_handoff_fixtures = list(sop_synthetic_dir.glob("deep-mode-handoff*.json"))
+    all_handoff_stems = {p.stem for p in sop_handoff_fixtures}
+    mapped_handoff_stems = set(SOP_HANDOFF_MAP.keys()) | set(SOP_HANDOFF_INVALID_MAP.keys())
+    unmapped_handoff = sorted(all_handoff_stems - mapped_handoff_stems)
+    runner.check(
+        "all sop deep-mode-handoff fixtures mapped",
+        len(unmapped_handoff) == 0,
+        f"unmapped: {unmapped_handoff}",
+    )
+
+    # 6d. Field contract: xthinking's required fields present in sop handoff
+    print("\n  6d. Field contract — xthinking required fields in sop handoff output")
+    xthink_handoff_schema = json.loads(handoff_schema_path.read_text())
+    xthink_required_fields = set(xthink_handoff_schema.get("required", []))
+    fixture_path = sop_synthetic_dir / "deep-mode-handoff-valid.json"
+    if fixture_path.is_file():
+        sop_handoff = json.loads(fixture_path.read_text())
+        present = {f for f in xthink_required_fields if f in sop_handoff}
+        missing = xthink_required_fields - present
+        runner.check(
+            "sop handoff has all fields xthinking requires",
+            len(missing) == 0,
+            f"missing: {sorted(missing)}",
+        )
+    else:
+        runner.check("sop handoff fixture exists for field contract check", False)
+
+    # 6e. Schema drift: if xthinking changes required fields, test fails
+    print("\n  6e. Schema drift guard — xthinking required fields are stable")
+    runner.check(
+        "xthinking handoff-brief requires request_id",
+        "request_id" in xthink_required_fields,
+    )
+    runner.check(
+        "xthinking handoff-brief requires analysis_type",
+        "analysis_type" in xthink_required_fields,
+    )
+    runner.check(
+        "xthinking handoff-brief requires context",
+        "context" in xthink_required_fields,
+    )
+    runner.check(
+        "xthinking handoff-brief requires evidence",
+        "evidence" in xthink_required_fields,
+    )
+    runner.check(
+        "xthinking handoff-brief requires confidence_score",
+        "confidence_score" in xthink_required_fields,
+    )
+    runner.check(
+        "xthinking handoff-brief requires need_review",
+        "need_review" in xthink_required_fields,
+    )
+
     return runner.summary()
 
 

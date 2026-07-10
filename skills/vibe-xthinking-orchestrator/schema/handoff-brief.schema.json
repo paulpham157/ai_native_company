@@ -10,7 +10,7 @@
     "analysis_type": {"type": "string", "enum": ["topic", "problem", "decision"]},
     "context": {
       "type": "object",
-      "required": ["charter_summary", "okr_summary", "industry_context"],
+      "required": ["charter_summary", "okr_summary"],
       "properties": {
         "charter_summary": {"type": "string"},
         "okr_summary": {"type": "string"},
