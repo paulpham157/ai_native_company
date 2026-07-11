@@ -278,6 +278,257 @@ def main():
     runner.check("quality rubric described", "Quality Rubric" in skill_md or "rubric" in skill_md.lower())
     runner.check("HITL described", "Human-in-the-Loop" in skill_md or "HITL" in skill_md)
 
+    # ========================================================================
+    # SLICE 7: Output Schema Validation — ReviewOrchestrator.review() output vs review-result.schema
+    # ========================================================================
+    print("\n[7] Output schema validation \u2014 review() output conforms to review-result.schema.json")
+
+    sys.path.insert(0, str(SKILL_DIR / "src"))
+    from orchestrator import ReviewOrchestrator
+
+    review_schema = json.loads((SKILL_DIR / "schema" / "review-result.schema.json").read_text())
+    from validator import validate_artifact, validate_instance
+
+    orch = ReviewOrchestrator()
+
+    print("\n  7a. Quick mode \u2014 markdown")
+    with tempfile.NamedTemporaryFile(mode="w", suffix=".md", delete=False) as f:
+        f.write("# Hello\n\nTest document.")
+        md_path = f.name
+    result = orch.review(md_path, mode="quick")
+    os.unlink(md_path)
+    errs = validate_instance(result, review_schema)
+    runner.check("quick mode markdown output validates against review-result schema",
+                 len(errs) == 0, "; ".join(errs[:3]))
+
+    print("\n  7b. Quick mode \u2014 JSON")
+    with tempfile.NamedTemporaryFile(mode="w", suffix=".json", delete=False) as f:
+        json.dump({"name": "test", "value": 42}, f)
+        json_path = f.name
+    result = orch.review(json_path, mode="quick")
+    os.unlink(json_path)
+    errs = validate_instance(result, review_schema)
+    runner.check("quick mode JSON output validates against review-result schema",
+                 len(errs) == 0, "; ".join(errs[:3]))
+
+    print("\n  7c. Quick mode \u2014 YAML")
+    with tempfile.NamedTemporaryFile(mode="w", suffix=".yaml", delete=False) as f:
+        f.write("key: value\nnested:\n  inner: 42\n")
+        yaml_path = f.name
+    result = orch.review(yaml_path, mode="quick")
+    os.unlink(yaml_path)
+    errs = validate_instance(result, review_schema)
+    runner.check("quick mode YAML output validates against review-result schema",
+                 len(errs) == 0, "; ".join(errs[:3]))
+
+    print("\n  7d. Full mode \u2014 markdown")
+    with tempfile.NamedTemporaryFile(mode="w", suffix=".md", delete=False) as f:
+        f.write("# Budget Report\n\nBudget: $10,000\nDeadline: 2026-12-31")
+        full_path = f.name
+    result = orch.review(full_path, mode="full")
+    os.unlink(full_path)
+    errs = validate_instance(result, review_schema)
+    runner.check("full mode markdown output validates against review-result schema",
+                 len(errs) == 0, "; ".join(errs[:3]))
+
+    print("\n  7e. Unsupported type \u2014 .txt")
+    with tempfile.NamedTemporaryFile(mode="w", suffix=".txt", delete=False) as f:
+        f.write("plain text")
+        txt_path = f.name
+    result = orch.review(txt_path, mode="quick")
+    os.unlink(txt_path)
+    errs = validate_instance(result, review_schema)
+    runner.check("unsupported .txt output validates against review-result schema (enum allows 'unsupported')",
+                 len(errs) == 0, "; ".join(errs[:3]))
+
+    # ========================================================================
+    # SLICE 8: Evidence/Confidence/Need Review Contract on Actual Output
+    # ========================================================================
+    print("\n[8] Evidence/Confidence/Need Review contract \u2014 actual review() output")
+
+    print("\n  8a. confidence_score in [0, 1]")
+    for ext, content, mode, label in [
+        (".md", "# Test", "quick", "markdown quick"),
+        (".json", '{"ok": true}', "quick", "JSON quick"),
+        (".yaml", "key: val\n", "quick", "YAML quick"),
+        (".md", "# Full\nBudget: $10,000", "full", "markdown full"),
+    ]:
+        with tempfile.NamedTemporaryFile(mode="w", suffix=ext, delete=False) as f:
+            f.write(content)
+            path = f.name
+        result = orch.review(path, mode=mode)
+        os.unlink(path)
+
+        cs = result.get("confidence_score")
+        runner.check(f"{label}: confidence_score={cs} in [0,1]",
+                     isinstance(cs, (int, float)) and 0 <= cs <= 1,
+                     f"got {cs}")
+
+    print("\n  8b. need_review is boolean")
+    for ext, content, mode, label in [
+        (".md", "# Test", "quick", "markdown quick"),
+        (".json", '{"ok": true}', "quick", "JSON quick"),
+        (".txt", "plain", "quick", "unsupported txt"),
+    ]:
+        with tempfile.NamedTemporaryFile(mode="w", suffix=ext, delete=False) as f:
+            f.write(content)
+            path = f.name
+        result = orch.review(path, mode=mode)
+        os.unlink(path)
+
+        nr = result.get("need_review")
+        runner.check(f"{label}: need_review={nr} is bool",
+                     isinstance(nr, bool),
+                     f"got {type(nr).__name__}")
+
+    print("\n  8c. evidence is a list with source/detail")
+    for ext, content, mode, label in [
+        (".md", "# Test", "quick", "markdown quick"),
+        (".json", '{"ok": true}', "quick", "JSON quick"),
+    ]:
+        with tempfile.NamedTemporaryFile(mode="w", suffix=ext, delete=False) as f:
+            f.write(content)
+            path = f.name
+        result = orch.review(path, mode=mode)
+        os.unlink(path)
+
+        ev = result.get("evidence", [])
+        runner.check(f"{label}: evidence is list",
+                     isinstance(ev, list),
+                     f"got {type(ev).__name__}")
+        if isinstance(ev, list) and len(ev) > 0:
+            item = ev[0]
+            runner.check(f"{label}: evidence[0] has 'source'",
+                         isinstance(item.get("source"), str) and len(item["source"]) > 0)
+            runner.check(f"{label}: evidence[0] has 'detail'",
+                         isinstance(item.get("detail"), str) and len(item["detail"]) > 0)
+
+    # ========================================================================
+    # SLICE 9: Error Recovery
+    # ========================================================================
+    print("\n[9] Error recovery \u2014 orchestrator handles malformed/gone-away input gracefully")
+
+    print("\n  9a. Non-existent artifact path")
+    result = orch.review("/tmp/nonexistent-xyz-123-file.md", mode="quick")
+    runner.check("missing .md artifact returns dict",
+                 isinstance(result, dict),
+                 f"got {type(result).__name__}")
+    runner.check("missing .md artifact flagged for review",
+                 result.get("need_review") is True,
+                 f"need_review={result.get('need_review')}")
+
+    print("\n  9b. Malformed JSON content")
+    with tempfile.NamedTemporaryFile(mode="w", suffix=".json", delete=False) as f:
+        f.write("this is not json {{{ broken")
+        bad_path = f.name
+    result = orch.review(bad_path, mode="quick")
+    os.unlink(bad_path)
+    runner.check("malformed JSON returns dict",
+                 isinstance(result, dict),
+                 f"got {type(result).__name__}")
+    if isinstance(result, dict):
+        issues = result.get("issues", [])
+        has_parse_error = any("parse" in i.get("message", "").lower() or "json" in i.get("message", "").lower() for i in issues)
+        runner.check("malformed JSON produces parse error issue",
+                     has_parse_error,
+                     f"issues: {[i.get('message') for i in issues[:3]]}")
+
+    print("\n  9c. Empty file")
+    with tempfile.NamedTemporaryFile(mode="w", suffix=".md", delete=False) as f:
+        f.write("")
+        empty_path = f.name
+    result = orch.review(empty_path, mode="quick")
+    os.unlink(empty_path)
+    runner.check("empty file returns dict",
+                 isinstance(result, dict),
+                 f"got {type(result).__name__}")
+
+    # ========================================================================
+    # SLICE 10: Handoff Round-Trip — Review upstream skill artifacts
+    # ========================================================================
+    print("\n[10] Handoff round-trip \u2014 review() on real upstream skill synthetic data")
+
+    sop_synthetic_dir = SKILL_DIR.parent / "vibe-sop-orchestrator" / "synthetic-data"
+    xthink_synthetic_dir = SKILL_DIR.parent / "vibe-xthinking-orchestrator" / "synthetic-data"
+
+    print("\n  10a. SOP artifact \u2014 sop-content-valid.json reviewed as JSON")
+    sop_fixture = sop_synthetic_dir / "sop-content-valid.json"
+    if sop_fixture.is_file():
+        result = orch.review(str(sop_fixture), mode="quick")
+        runner.check("SOP content artifact reviewed returns dict",
+                     isinstance(result, dict))
+        errs = validate_instance(result, review_schema)
+        runner.check("SOP content review output validates against review-result schema",
+                     len(errs) == 0, "; ".join(errs[:3]))
+        runner.check("SOP content artifact_type is 'json'",
+                     result.get("artifact_type") == "json",
+                     f"got '{result.get('artifact_type')}'")
+
+    print("\n  10b. SOP artifact \u2014 sop-metadata-valid.json reviewed as JSON")
+    sop_meta = sop_synthetic_dir / "sop-metadata-valid.json"
+    if sop_meta.is_file():
+        result = orch.review(str(sop_meta), mode="quick")
+        runner.check("SOP metadata artifact reviewed returns dict",
+                     isinstance(result, dict))
+        errs = validate_instance(result, review_schema)
+        runner.check("SOP metadata review output validates against review-result schema",
+                     len(errs) == 0, "; ".join(errs[:3]))
+
+    print("\n  10c. Xthinking artifact \u2014 topic-analysis-valid.json reviewed as JSON")
+    xthink_fixture = xthink_synthetic_dir / "topic-analysis-valid.json"
+    if xthink_fixture.is_file():
+        result = orch.review(str(xthink_fixture), mode="quick")
+        runner.check("Xthinking topic analysis reviewed returns dict",
+                     isinstance(result, dict))
+        errs = validate_instance(result, review_schema)
+        runner.check("Xthinking review output validates against review-result schema",
+                     len(errs) == 0, "; ".join(errs[:3]))
+        runner.check("Xthinking artifact_type is 'json'",
+                     result.get("artifact_type") == "json",
+                     f"got '{result.get('artifact_type')}'")
+
+    print("\n  10d. Xthinking artifact \u2014 evidence-tracking-valid.json reviewed as JSON")
+    xthink_ev = xthink_synthetic_dir / "evidence-tracking-valid.json"
+    if xthink_ev.is_file():
+        result = orch.review(str(xthink_ev), mode="quick")
+        runner.check("Xthinking evidence tracking reviewed returns dict",
+                     isinstance(result, dict))
+        errs = validate_instance(result, review_schema)
+        runner.check("Xthinking evidence review output validates against review-result schema",
+                     len(errs) == 0, "; ".join(errs[:3]))
+
+    # ========================================================================
+    # SLICE 11: Cross-skill Schema Validation — review-result fixtures
+    # ========================================================================
+    print("\n[11] Cross-skill schema validation \u2014 review-result synthetic-data fixtures")
+
+    review_synthetic_dir = SKILL_DIR / "synthetic-data"
+
+    print("\n  11a. Valid fixture passes review-result schema")
+    valid_path = review_synthetic_dir / "review-result-valid.json"
+    if valid_path.is_file():
+        result = validate_artifact(str(valid_path), str(SKILL_DIR / "schema" / "review-result.schema.json"))
+        runner.check("review-result-valid.json passes schema validation",
+                     result.get("ok") is True,
+                     "; ".join(result.get("errors", [])[:3]))
+
+    print("\n  11b. Invalid fixture rejected by review-result schema")
+    invalid_path = review_synthetic_dir / "review-result-invalid.json"
+    if invalid_path.is_file():
+        result = validate_artifact(str(invalid_path), str(SKILL_DIR / "schema" / "review-result.schema.json"))
+        runner.check("review-result-invalid.json rejected by schema",
+                     result.get("ok") is False,
+                     "expected rejection, got ok=True")
+
+    print("\n  11c. Fixture-coverage guard")
+    all_review_fixtures = list(review_synthetic_dir.glob("review-result*.json"))
+    mapped_stems = {"review-result-valid", "review-result-invalid"}
+    all_stems = {p.stem for p in all_review_fixtures}
+    unmapped = sorted(all_stems - mapped_stems)
+    runner.check("all review-result fixtures mapped in test",
+                 len(unmapped) == 0,
+                 f"unmapped: {unmapped}")
+
     return runner.summary()
 
 
