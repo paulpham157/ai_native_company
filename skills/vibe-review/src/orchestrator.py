@@ -2,7 +2,7 @@ from dataclasses import asdict
 from pathlib import Path
 
 from artifact_detector import detect_type
-from models import ReviewResult, Evidence
+from models import Issue, ReviewResult, Evidence
 from rules_reviewer import run_rules_review
 from schema_reviewer import run_schema_review
 from rubric_reviewer import run_rubric_review
@@ -20,6 +20,17 @@ class ReviewOrchestrator:
 
     def review(self, artifact_path: str, mode: str = "quick") -> dict:
         artifact_type = detect_type(artifact_path, self._type_map)
+
+        if not Path(artifact_path).exists():
+            return asdict(ReviewResult(
+                artifact_path=artifact_path,
+                artifact_type=artifact_type,
+                issues=[Issue(severity="error", message=f"Artifact not found: {artifact_path}", location="")],
+                evidence=[Evidence(source="detector", detail=f"File does not exist: {artifact_path}")],
+                confidence_score=0.0,
+                need_review=True,
+                summary=f"Artifact not found: {artifact_path}",
+            ))
 
         if artifact_type == "unsupported":
             return self._unsupported_result(artifact_path)
@@ -52,12 +63,12 @@ class ReviewOrchestrator:
         ))
 
     def _unsupported_result(self, artifact_path: str) -> dict:
-        return {
-            "artifact_path": artifact_path,
-            "artifact_type": "unsupported",
-            "issues": [{"severity": "warning", "message": "Unsupported artifact type"}],
-            "evidence": [{"source": "detector", "detail": f"Cannot review .{Path(artifact_path).suffix.lstrip('.')} files"}],
-            "confidence_score": 0.0,
-            "need_review": True,
-            "summary": f"Unsupported artifact type: {Path(artifact_path).suffix}",
-        }
+        return asdict(ReviewResult(
+            artifact_path=artifact_path,
+            artifact_type="unsupported",
+            issues=[Issue(severity="warning", message="Unsupported artifact type", location="")],
+            evidence=[Evidence(source="detector", detail=f"Cannot review .{Path(artifact_path).suffix.lstrip('.')} files")],
+            confidence_score=0.0,
+            need_review=True,
+            summary=f"Unsupported artifact type: {Path(artifact_path).suffix}",
+        ))
